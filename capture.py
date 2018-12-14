@@ -1,5 +1,5 @@
 # Settings
-CAPTURE_DIR = 'data/2018-12-13/'
+CAPTURE_DIR = 'captured_data/2018-12-13/'
 CAPTURE_EXT = '.jpg'
 
 CAPTURE_BOX_START = (90, 90)
