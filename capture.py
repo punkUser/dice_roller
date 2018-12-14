@@ -52,14 +52,14 @@ class ArduinoSerial:
 
 arduinoSerial = ArduinoSerial();
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW + 0)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
 #cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
-cap.set(cv2.CAP_PROP_AUTOFOCUS, 0)
-cap.set(cv2.CAP_PROP_EXPOSURE, -5.0)
-cap.set(cv2.CAP_PROP_FOCUS, 45)
+#cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
+#cap.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+#cap.set(cv2.CAP_PROP_EXPOSURE, -6.0)
+#cap.set(cv2.CAP_PROP_FOCUS, 45)
 
 cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
