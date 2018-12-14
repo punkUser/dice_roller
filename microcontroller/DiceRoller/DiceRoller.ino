@@ -11,7 +11,7 @@ static const int k_commandCycleDone = 5;
 
 static const int k_upDegrees      = 0;
 static const int k_downDegrees    = 180;
-static const int k_loadDegrees    = 95;
+static const int k_loadDegrees    = 90;
 
 static const int k_cycleTimeMs    = 3000;
 
@@ -29,7 +29,7 @@ void setup()
 {
     Serial.begin(9600);
     
-    g_servo.attach(9, 535, 1415);    
+    g_servo.attach(9, 535, 1440);    
     g_servo.write(k_loadDegrees);
 
     g_previousTimeMs = millis();
