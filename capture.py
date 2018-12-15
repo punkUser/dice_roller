@@ -1,5 +1,5 @@
 # Settings
-CAPTURE_DIR = 'captured_data/test1/'
+CAPTURE_DIR = 'captured_data/test2/'
 CAPTURE_EXT = '.jpg'
 
 CAPTURE_BOX_START = (90, 90)
