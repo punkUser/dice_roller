@@ -75,10 +75,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			
 			#diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
 			diff = cv2.add(diff[:,:,0], cv2.add(diff[:,:,1], diff[:,:,2]))
-			ret,diff = cv2.threshold(diff, 3, 255, cv2.THRESH_BINARY)
+			ret,diff = cv2.threshold(diff, 8, 255, cv2.THRESH_BINARY)
 			
 			diff = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel, iterations=20)
-			#diff = cv2.morphologyEx(diff, cv2.MORPH_CLOSE, kernel, iterations=10)
+			diff = cv2.morphologyEx(diff, cv2.MORPH_CLOSE, kernel, iterations=3)
 			
 			diffAccum = cv2.min(diff, diffAccum)
 	
