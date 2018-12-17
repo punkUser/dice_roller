@@ -117,30 +117,34 @@ DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_valu
 
 captureIndex = 0
 autoAdvance = False
+lastCaptureIndex = -1
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
-	captureImage = readCaptureImage(captureIndex)
-	print("Processing capture {}".format(captureIndex))
+	if captureIndex != lastCaptureIndex:
+		captureImage = readCaptureImage(captureIndex)
+		print("Processing capture {}".format(captureIndex))
+		lastCaptureIndex = captureIndex
 
-	# X-Wing green die in comparment D
-	dieD = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_D_RECT, XWING_GREEN_DIE_HSV_RANGE)
-	# X-Wing red die in compartment C
-	dieC = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_C_RECT, XWING_RED_DIE_HSV_RANGE)
-	
-	saveCroppedDieImage(dieD, captureIndex, 'D')
-	saveCroppedDieImage(dieC, captureIndex, 'C')
-	
-	display = np.concatenate((dieD, dieC), 1)
+		# X-Wing green die in comparment D
+		dieD = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_D_RECT, XWING_GREEN_DIE_HSV_RANGE)
+		# X-Wing red die in compartment C
+		dieC = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_C_RECT, XWING_RED_DIE_HSV_RANGE)
+		
+		saveCroppedDieImage(dieD, captureIndex, 'D')
+		saveCroppedDieImage(dieC, captureIndex, 'C')
+		
+		display = np.concatenate((dieD, dieC), 1)
 
-	# DEBUG
-	#display = captureImage
-	#display = cv2.rectangle(display, COMPARTMENT_D_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
-	#display = drawHSVRangeDieRect(captureImage, display, XWING_GREEN_DIE_HSV_RANGE, DIE_RECT_SIZE)
-	#display = drawHSVRangeDieRect(captureImage, display, XWING_RED_DIE_HSV_RANGE, DIE_RECT_SIZE)
+		# DEBUG
+		#display = captureImage
+		#display = cv2.rectangle(display, COMPARTMENT_D_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
+		#display = drawHSVRangeDieRect(captureImage, display, XWING_GREEN_DIE_HSV_RANGE, DIE_RECT_SIZE)
+		#display = drawHSVRangeDieRect(captureImage, display, XWING_RED_DIE_HSV_RANGE, DIE_RECT_SIZE)
+		
+		cv2.imshow('main1', display)
+		
 	
-	cv2.imshow('main1', display)
-	
-	key = cv2.waitKeyEx(1 if autoAdvance else 0)
+	key = cv2.waitKeyEx(1 if autoAdvance else 10)
 	if (key >= 0):
 		if key == KEY_RIGHT:
 			captureIndex += 1
@@ -161,7 +165,6 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			captureIndex -= 1
 
 cv2.destroyAllWindows()
-
 
 
 ###################################################################################################
