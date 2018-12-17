@@ -3,7 +3,8 @@ import os
 # Settings
 CAPTURE_NAME = 'test2'
 RUN_NAME = '20181214_144327'
-IMAGE_EXT = '.jpg'
+INPUT_EXT = '.jpg'
+OUTPUT_EXT = '.jpg'
 
 
 ###################################################################################################
@@ -30,7 +31,7 @@ COMPARTMENT_C_RECT = ((210, 62), (365, 450))
 ###################################################################################################
 
 def captureImageFileName(index):
-	file = "{:06d}{}".format(index, IMAGE_EXT)
+	file = "{:06d}{}".format(index, INPUT_EXT)
 	return os.path.join('captured_data', CAPTURE_NAME, RUN_NAME, file)
 
 def captureImageExists(index):
@@ -40,7 +41,7 @@ def readCaptureImage(index):
 	return cv2.imread(captureImageFileName(index))
 
 def saveCroppedDieImage(image, index, compartment):
-	file = "{:06d}{}".format(index, IMAGE_EXT)
+	file = "{:06d}{}".format(index, OUTPUT_EXT)
 	path = os.path.join('output', CAPTURE_NAME, RUN_NAME, compartment)	
 	if not os.path.exists(path):
 		os.makedirs(path)	
