@@ -30,6 +30,14 @@ COMPARTMENT_C_RECT = ((210, 62), (365, 450))
 
 ###################################################################################################
 
+# Currently returns dieC, dieD
+def computeCroppedDieImages(image):
+	# X-Wing green die in comparment D
+	dieD = findHSVRangeDieInCompartment(image, COMPARTMENT_D_RECT, XWING_GREEN_DIE_HSV_RANGE)
+	# X-Wing red die in compartment C
+	dieC = findHSVRangeDieInCompartment(image, COMPARTMENT_C_RECT, XWING_RED_DIE_HSV_RANGE)	
+	return (dieC, dieD)
+
 def captureImageFileName(index):
 	file = "{:06d}{}".format(index, INPUT_EXT)
 	return os.path.join('captured_data', CAPTURE_NAME, RUN_NAME, file)
@@ -40,12 +48,11 @@ def captureImageExists(index):
 def readCaptureImage(index):
 	return cv2.imread(captureImageFileName(index))
 
-def saveCroppedDieImage(image, index, compartment):
-	file = "{:06d}{}".format(index, OUTPUT_EXT)
+def saveCroppedDieImage(image, compartment, fileName):
 	path = os.path.join('output', CAPTURE_NAME, RUN_NAME, compartment)	
 	if not os.path.exists(path):
-		os.makedirs(path)	
-	cv2.imwrite(os.path.join(path, file), image)
+		os.makedirs(path)
+	cv2.imwrite(os.path.join(path, fileName), image)
 
 # Mask via HSV range filtering (good for colored dice)
 def computeHSVRangeMask(image, range):
@@ -54,7 +61,7 @@ def computeHSVRangeMask(image, range):
 	
 	# Simple cleanup
 	kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
-	mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=2)
+	mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=3)
 	mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=10)
 	
 	return mask
@@ -88,10 +95,11 @@ def findHSVRangeDieInCompartment(image, compartmentRect, hsvRange, rectSize = DI
 	# Sanity check that it covers all the data in the mask
 	# NOTE: Negative numbers have special meaning in slices, so clamp them out here
 	mask[max(0, dieRect[0][1]):max(0, dieRect[1][1]), max(0, dieRect[0][0]):max(0, dieRect[1][0])] = 0
-	if np.count_nonzero(mask) > 0:
+	outsideMaskCount = np.count_nonzero(mask)
+	if outsideMaskCount > 0:
 		cv2.imshow('error_mask', mask)
-		print('ERROR: Die mask data outside rectangle!')
-		#raise ValueException('Die mask data outside rectangle!')
+		print('ERROR: {} pixels outside die rectangle!'.format(outsideMaskCount))
+		raise ValueException('Die mask data outside rectangle!')
 	
 	# Return cropped image (from original since rectangle may overlap)
 	dieRectAbsolute = ((dieRect[0][0]+compartmentRect[0][0],dieRect[0][1]+compartmentRect[0][1]), (dieRect[1][0]+compartmentRect[0][0],dieRect[1][1]+compartmentRect[0][1]))	
@@ -115,23 +123,18 @@ cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
 DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_value'])
 
-captureIndex = 0
-autoAdvance = False
+captureIndex = 11179
 lastCaptureIndex = -1
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
 	if captureIndex != lastCaptureIndex:
-		captureImage = readCaptureImage(captureIndex)
-		print("Processing capture {}".format(captureIndex))
+		if captureImageExists(captureIndex):
+			captureImage = readCaptureImage(captureIndex)
+			print("Processing capture {}".format(captureIndex))
+			dieC, dieD = computeCroppedDieImages(captureImage)
+		else:
+			print("Capture {} not found!".format(captureIndex))
 		lastCaptureIndex = captureIndex
-
-		# X-Wing green die in comparment D
-		dieD = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_D_RECT, XWING_GREEN_DIE_HSV_RANGE)
-		# X-Wing red die in compartment C
-		dieC = findHSVRangeDieInCompartment(captureImage, COMPARTMENT_C_RECT, XWING_RED_DIE_HSV_RANGE)
-		
-		saveCroppedDieImage(dieD, captureIndex, 'D')
-		saveCroppedDieImage(dieC, captureIndex, 'C')
 		
 		display = np.concatenate((dieD, dieC), 1)
 
@@ -142,9 +145,9 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		#display = drawHSVRangeDieRect(captureImage, display, XWING_RED_DIE_HSV_RANGE, DIE_RECT_SIZE)
 		
 		cv2.imshow('main1', display)
-		
 	
-	key = cv2.waitKeyEx(1 if autoAdvance else 10)
+	
+	key = cv2.waitKeyEx(10)
 	if (key >= 0):
 		if key == KEY_RIGHT:
 			captureIndex += 1
@@ -156,13 +159,15 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		elif key == KEY_UP:
 			pass
 		elif key == ord(' '):
-			autoAdvance = not autoAdvance
-	
-	if autoAdvance:
-		captureIndex += 1
-		if (not captureImageExists(captureIndex)):
-			autoAdvance = False
-			captureIndex -= 1
+			# Process entire directory batch-style
+			fileList = Path(os.path.join('captured_data', CAPTURE_NAME, RUN_NAME)).glob('*' + INPUT_EXT)
+			for file in fileList:
+				fileName = os.path.basename(file)
+				print("Processing {}".format(file))
+				batchImage = cv2.imread(str(file))
+				batchDieC, batchDieD = computeCroppedDieImages(batchImage)
+				saveCroppedDieImage(batchDieC,'C', fileName)
+				saveCroppedDieImage(batchDieD,'D', fileName)
 
 cv2.destroyAllWindows()
 
