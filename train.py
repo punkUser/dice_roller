@@ -59,7 +59,7 @@ class SimpleNet(nn.Module):
 		#self.net = nn.Sequential(self.unit1, self.unit2, self.unit3, self.pool1)
 
 		dimAfterPooling = int(IMAGE_DIMENSIONS / 4)		# Two 1/2 size pooling steps
-		self.fcSize = 4 * dimAfterPooling * dimAfterPooling
+		self.fcSize = 8 * dimAfterPooling * dimAfterPooling
 		
 		self.fc = nn.Linear(in_features = self.fcSize, out_features = num_classes)
 
