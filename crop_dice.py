@@ -1,5 +1,3 @@
-import os
-
 # Settings
 CAPTURE_NAME = 'test2'
 RUN_NAME = '20181214_144327'
@@ -8,6 +6,7 @@ OUTPUT_EXT = '.jpg'
 
 
 ###################################################################################################
+import os
 import numpy as np
 import cv2
 import datetime
