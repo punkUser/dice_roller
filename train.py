@@ -1,7 +1,14 @@
+# Settings
+TRAIN_DATA = 'training_data/xwing_red'
+TEST_DATA  = 'test_data/xwing_red'
+
 # TODO: Play with this - probably want to resize before dumping into the NN
 IMAGE_DIMENSIONS = 84
+# NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for current network
 BATCH_SIZE = 16
 
+
+###################################################################################################
 import torch
 import torch.nn as nn
 import torch.optim
@@ -19,52 +26,59 @@ def imshow(img):
 	plt.imshow(np.transpose(npimg, (1, 2, 0)))
 	plt.show()
 
-class Unit(nn.Module):
-	def __init__(self, in_channels, out_channels):
-		super(Unit, self).__init__()		
-		self.conv = nn.Conv2d(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = 1, padding = 1)
-		self.bn = nn.BatchNorm2d(num_features = out_channels)
+class ConvUnit(nn.Module):
+	def __init__(self, in_channels, out_channels, stride=1, padding=1):
+		super(ConvUnit, self).__init__()		
+		self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=stride, padding=padding)
 		self.relu = nn.ReLU()
+		self.bn = nn.BatchNorm2d(num_features=out_channels)
 
 	def forward(self,input):
 		output = self.conv(input)
-		output = self.bn(output)
 		output = self.relu(output)
+		output = self.bn(output)
 		return output
 
 class SimpleNet(nn.Module):
 	def __init__(self, num_classes):
 		super(SimpleNet,self).__init__()
 
-		# NOTE: Probably a massively overkill network for our problem but it's fast and it works,
+		# NOTE: Probably a overkill network for our problem but it's fast and it works,
 		# so not much motivation to optimize it down at the moment.
 		
-		self.unit1 = Unit(in_channels=3, out_channels=4)
-		self.unit2 = Unit(in_channels=4, out_channels=4)
-		self.unit3 = Unit(in_channels=4, out_channels=4)
+		self.unit1 = ConvUnit(in_channels=3, out_channels=4)
+		self.unit2 = ConvUnit(in_channels=4, out_channels=4)
+		self.unit3 = ConvUnit(in_channels=4, out_channels=4)
 
-		self.pool1 = nn.MaxPool2d(kernel_size = 2)
+		# In some ways letting the network learn the pooling step via strided convolution is nice,
+		# but in practice MaxPool is somewhat quicker and more consistent for our data set right now.
+		self.pool1 = nn.MaxPool2d(kernel_size=2)		
+		#self.pool1 = ConvUnit(in_channels=4, out_channels=4, stride=2)
+		
+		#self.pool1 = nn.Conv2d(in_channels=4, out_channels=4, kernel_size=3, stride=2, padding=1)
+		#self.pool1relu = nn.ReLU();
 
-		self.unit4 = Unit(in_channels=4, out_channels=8)
-		self.unit5 = Unit(in_channels=8, out_channels=8)
-		self.unit6 = Unit(in_channels=8, out_channels=8)
-		self.unit7 = Unit(in_channels=8, out_channels=8)
+		self.unit4 = ConvUnit(in_channels=4, out_channels=8)
+		self.unit5 = ConvUnit(in_channels=8, out_channels=8)
+		self.unit6 = ConvUnit(in_channels=8, out_channels=8)
+		self.unit7 = ConvUnit(in_channels=8, out_channels=8)
 
-		self.pool2 = nn.MaxPool2d(kernel_size = 2)
+		self.pool2 = nn.MaxPool2d(kernel_size=2)
+		#self.pool2 = ConvUnit(in_channels=8, out_channels=8, stride=2)
 		
 		# Add all the units into the Sequential layer in exact order
 		self.net = nn.Sequential(self.unit1, self.unit2, self.unit3, self.pool1,
 								 self.unit4, self.unit5, self.unit6, self.unit7, self.pool2)
-		
-		#self.net = nn.Sequential(self.unit1, self.unit2, self.unit3, self.pool1)
 
-		dimAfterPooling = int(IMAGE_DIMENSIONS / 4)		# Two 1/2 size pooling steps
+		 # Two 1/2 size pooling steps
+		dimAfterPooling = int(IMAGE_DIMENSIONS / 4)
 		self.fcSize = 8 * dimAfterPooling * dimAfterPooling
 		
-		self.fc = nn.Linear(in_features = self.fcSize, out_features = num_classes)
+		self.fc = nn.Linear(in_features=self.fcSize, out_features=num_classes)
 
 	def forward(self, input):
 		output = self.net(input)
+		#print(output.shape)
 		output = output.view(-1, self.fcSize)
 		output = self.fc(output)
 		return output
@@ -149,7 +163,7 @@ class ImgAugTrainTransform:
             order = 1,
             cval = (0, 255),
         ),
-		iaa.Sometimes(0.25, iaa.GaussianBlur(sigma = [1.0, 2.0])),
+		iaa.Sometimes(0.25, iaa.GaussianBlur(sigma=[1.0, 1.8])),
 		iaa.AddToHueAndSaturation((-10, 10)),
 		#iaa.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
     ])
@@ -169,9 +183,9 @@ if __name__ == "__main__":
 		torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 	])
 	
-	trainSet = torchvision.datasets.ImageFolder(root='training_data/xwing_red', transform = trainTransform)	
+	trainSet = torchvision.datasets.ImageFolder(root=TRAIN_DATA, transform=trainTransform)	
 	print("Raw training set size: {}".format(len(trainSet)))
-	trainLoader = torch.utils.data.DataLoader(trainSet, batch_size = BATCH_SIZE, shuffle = True, num_workers = 4)
+	trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 	
 	classLabelStrings = trainSet.classes
 	print("Classes: {}".format(classLabelStrings))
@@ -181,9 +195,9 @@ if __name__ == "__main__":
 		torchvision.transforms.ToTensor(),
 		torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 	])
-	testSet = torchvision.datasets.ImageFolder(root='test_data/xwing_red', transform = testTransform)	
+	testSet = torchvision.datasets.ImageFolder(root=TEST_DATA, transform=testTransform)	
 	print("Test set size: {}".format(len(testSet)))
-	testLoader  = torch.utils.data.DataLoader(testSet,  batch_size = BATCH_SIZE, shuffle = False, num_workers = 4)
+	testLoader  = torch.utils.data.DataLoader(testSet,  batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
 
 	#trainCount = int(0.8 * datasetCount)
@@ -199,10 +213,10 @@ if __name__ == "__main__":
 	model.to(device)
 
 	optimizer = torch.optim.SGD(model.parameters(), lr = 0.01, momentum = 0.9)
-	scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 30,  gamma = 0.1)
+	scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 20,  gamma = 0.1)
 	loss_fn = nn.CrossEntropyLoss()
 
-	train(30)
+	train(20)
 	
 	# Final test and display of mispredicted ones
 	test_acc = test(True)
