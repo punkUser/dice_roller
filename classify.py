@@ -5,9 +5,6 @@ INPUT_EXT = '.jpg'
 COPY_CLASSIFIED_FILES = True
 
 IMAGE_DIMENSIONS = 84
-# NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
-BATCH_SIZE = 16
-
 
 ###################################################################################################
 import dice_cnn
@@ -19,6 +16,7 @@ import numpy as np
 import os
 import PIL
 import shutil
+import csv
 from pathlib import Path
 
 # From torchvision
@@ -59,13 +57,13 @@ def main():
 		torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 	])
 	test_set = Dataset(root=os.path.join(ROOT_DATA_DIR, 'cropped'), transform=test_transform)
-	test_loader	= torch.utils.data.DataLoader(test_set,	batch_size=BATCH_SIZE, shuffle=False, num_workers=1)
+	test_loader	= torch.utils.data.DataLoader(test_set,	batch_size=256, shuffle=False, num_workers=4)
 
 	print("Input set size: {}".format(len(test_set)))
 	
 	# DEBUG
 	images = iter(test_loader).next()
-	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:16][0], nrow = 4))
+	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
 		
 	# TODO: Sort out this workaround for class label timing... dependency is only on the # of classes really
 	model = dice_cnn.Model([str(x) for x in range(4)], IMAGE_DIMENSIONS)
@@ -79,13 +77,21 @@ def main():
 			path = os.path.join(output_dir, class_label)
 			if not os.path.exists(path):
 				os.makedirs(path)
-	
+
+	# TODO Maybe give it a name based on the path instead so it could be moved to same dir as others
+	csv_file = open(os.path.join(output_dir, "dice.csv"), mode='w', newline='')
+	csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+	csv_writer.writerow(["File"] + class_labels)
 	
 	for images, _unused, paths in test_loader:
 		labels = model.classify(images)
+		for label, path in zip(labels, paths):
+			labels = [0] * len(class_labels)
+			labels[label] = 1
+			csv_writer.writerow([os.path.basename(path)] + labels)
 		
-		if COPY_CLASSIFIED_FILES:
-			for label, path in zip(labels, paths):
+			if COPY_CLASSIFIED_FILES:
 				target_dir = os.path.join(output_dir, class_labels[label])
 				shutil.copy2(path, target_dir)
 

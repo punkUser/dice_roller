@@ -1,7 +1,7 @@
 # Settings
-TRAIN_DATA = 'training_data/xwing_red'
-TEST_DATA  = 'test_data/xwing_red'
-OUTPUT_MODEL_FILE = 'output/xwing_red.tar'
+TRAIN_DATA = 'training_data/xwing_green'
+TEST_DATA  = 'test_data/xwing_green'
+OUTPUT_MODEL_FILE = 'output/xwing_green.tar'
 
 IMAGE_DIMENSIONS = 84
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
