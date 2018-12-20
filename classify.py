@@ -1,6 +1,7 @@
 # Settings
-ROOT_DATA_DIR  = 'output/test2/20181214_144327/C/'
-INPUT_MODEL_FILE = 'models/xwing_red.tar'
+ROOT_DATA_DIR  = 'output/test2/20181214_144327/D/'
+INPUT_MODEL_FILE = 'models/xwing_green.tar'
+INPUT_MODEL_CLASSES = 3			# TODO: Eliminate this...
 INPUT_EXT = '.jpg'
 COPY_CLASSIFIED_FILES = True
 
@@ -66,7 +67,7 @@ def main():
 	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
 		
 	# TODO: Sort out this workaround for class label timing... dependency is only on the # of classes really
-	model = dice_cnn.Model([str(x) for x in range(4)], IMAGE_DIMENSIONS)
+	model = dice_cnn.Model([str(x) for x in range(INPUT_MODEL_CLASSES)], IMAGE_DIMENSIONS)
 	model.load(INPUT_MODEL_FILE)
 	class_labels = model.get_class_labels()
 	
