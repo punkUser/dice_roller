@@ -48,7 +48,7 @@ def readCaptureImage(index):
 	return cv2.imread(captureImageFileName(index))
 
 def saveCroppedDieImage(image, compartment, fileName):
-	path = os.path.join('output', CAPTURE_NAME, RUN_NAME, compartment)	
+	path = os.path.join('output', CAPTURE_NAME, RUN_NAME, compartment, 'cropped')
 	if not os.path.exists(path):
 		os.makedirs(path)
 	cv2.imwrite(os.path.join(path, fileName), image)

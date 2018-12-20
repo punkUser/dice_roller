@@ -70,21 +70,24 @@ class Net(nn.Module):
 		return output
 
 class Model:
-	def __init__(self, class_label_strings, image_dimensions):
-		self.class_label_strings = class_label_strings
+	def __init__(self, class_labels, image_dimensions):
+		self.class_labels = class_labels
 		self.epoch = 0
 	
 		self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 		print("Device: {}".format(self.device))
 					
 		# Create model, optimizer and loss function
-		self.model = Net(len(self.class_label_strings), image_dimensions)
+		self.model = Net(len(self.class_labels), image_dimensions)
 		self.model.to(self.device)
 
 		self.optimizer    = torch.optim.SGD(self.model.parameters(), lr = 0.01, momentum = 0.9)
 		self.scheduler    = torch.optim.lr_scheduler.StepLR(self.optimizer, 20,	gamma = 0.1)
 		self.loss_function = nn.CrossEntropyLoss()
-			
+
+	def get_class_labels(self):
+		return self.class_labels
+		
 	def save(self, file_name):
 		torch.save({
 			'epoch': self.epoch,
@@ -92,8 +95,9 @@ class Model:
 			'optimizer_state_dict': self.optimizer.state_dict(),
 			'scheduler_state_dict': self.scheduler.state_dict(),
 			'loss': self.loss_function,
+			'class_labels': self.class_labels,
 			}, file_name)
-		#print('Model saved to {}'.format(file_name))
+		print('Model saved to {}'.format(file_name))
 		
 	def load(self, file_name):
 		checkpoint = torch.load(file_name)
@@ -103,14 +107,27 @@ class Model:
 		self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 		self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])		
 		self.loss_function = checkpoint['loss']
+		self.class_labels = checkpoint['class_labels']
+		
+		# TODO: Sort out train GPU vs infer CPU and other combos...
 		
 		print('Model loaded from {}'.format(file_name))
 
+	# Classify a batch of images with the model, returning predicted class tensor
+	def classify(self, images):
+		self.model.eval()
+		images = images.to(self.device)
+
+		# Predict classes using images from the test set
+		outputs = self.model(images)
+		_, predicted = torch.max(outputs.data, 1)
+		return predicted
+		
 	def test(self, loader, show_error_images = False):
 		self.model.eval()
 		correct = 0
 		total = 0
-		for i, (images, labels) in enumerate(loader):
+		for images, labels in loader:
 			images, labels = images.to(self.device), labels.to(self.device)
 
 			# Predict classes using images from the test set
@@ -129,7 +146,7 @@ class Model:
 					
 				for i in range(len(predicted)):
 					if predicted[i] != labels[i]:
-						print("Index ~{} Predicted {}, expected {}. Weights {}".format(total, class_label_strings[predicted[i]], class_label_strings[labels[i]], outputs.data[i]))
+						print("Index ~{} Predicted {}, expected {}. Weights {}".format(total, self.class_labels[predicted[i]], self.class_labels[labels[i]], outputs.data[i]))
 						show_tensor_image(images[i].cpu())
 
 		test_acc = correct / total
@@ -144,7 +161,7 @@ class Model:
 			total = 0
 			train_accuracy = 0
 			train_loss = 0
-			for i, (images, labels) in enumerate(train_loader):
+			for images, labels in train_loader:
 				# Move images and labels to gpu if available
 				images, labels = images.to(self.device), labels.to(self.device)
 
@@ -168,6 +185,5 @@ class Model:
 			test_accuracy = self.test(test_loader)
 			print("Epoch {}, Train Accuracy: {:.5f} , train_loss: {} , Test Accuracy: {:.5f}".format(self.epoch, train_accuracy, train_loss, test_accuracy))
 			
-			# Save checkpoint
-			self.save("output/checkpoint.tar")
+			#self.save("output/checkpoint.tar")
 			self.epoch += 1

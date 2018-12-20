@@ -64,8 +64,13 @@ def main():
 	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:16], nrow = 4))
 		
 	model = dice_cnn.Model(class_label_strings, IMAGE_DIMENSIONS)
-	model.load(OUTPUT_MODEL_FILE) # Continue onwards!
-	#model.train(30, train_loader, test_loader)
+	#model.load(OUTPUT_MODEL_FILE) # Continue onwards!
+	
+	model.train(30, train_loader, test_loader)
+	model.save(OUTPUT_MODEL_FILE)
+	model.train(30, train_loader, test_loader)
+	model.save(OUTPUT_MODEL_FILE)
+	#model.train(60, train_loader, test_loader)
 	#model.save(OUTPUT_MODEL_FILE)
 	
 	# Final test and display of mispredicted ones
