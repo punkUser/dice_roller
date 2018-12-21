@@ -1,7 +1,7 @@
 # Settings
-TRAIN_DATA = 'training_data/xwing_green'
-TEST_DATA  = 'test_data/xwing_green'
-OUTPUT_MODEL_FILE = 'output/xwing_green.tar'
+TRAIN_DATA = 'training_data/xwing_red'
+TEST_DATA  = 'test_data/xwing_red'
+OUTPUT_MODEL_FILE = 'output/xwing_red.tar'
 
 IMAGE_DIMENSIONS = 84
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
@@ -21,8 +21,8 @@ class ImgAugtrain_transform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
 			imgaug.augmenters.Affine(
-				scale = {"x": (0.9, 1.1), "y": (0.9, 1.1)},
-				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+				scale = (0.8, 1.1),
+				translate_percent = {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
 				rotate = (0, 360),
 				order = 1,
 				cval = (0, 255),

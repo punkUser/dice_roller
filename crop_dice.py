@@ -1,6 +1,6 @@
-# Settings
-CAPTURE_NAME = 'test2'
-RUN_NAME = '20181214_144327'
+# Settings (need to edit compute_cropped_die_images below for now as well!)
+CAPTURE_NAME = 'test3'
+RUN_NAME = '20181215_combined'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
@@ -34,10 +34,8 @@ COMPARTMENT_A_RECT = ((510, 62), (670, 450))
 
 # Currently returns dieC, dieD
 def compute_cropped_die_images(image):
-	# X-Wing green die in comparment D
-	dieD = find_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, XWING_GREEN_DIE_HSV_RANGE)
-	# X-Wing red die in compartment C
-	dieC = find_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, XWING_RED_DIE_HSV_RANGE)	
+	dieD = find_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, XWING_RED_DIE_HSV_RANGE)
+	dieC = find_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, XWING_GREEN_DIE_HSV_RANGE)	
 	return (dieC, dieD)
 
 def capture_imagefile_name(index):
@@ -64,7 +62,7 @@ def compute_hsv_range_mask(image, range, cleanup = True):
 	# Simple cleanup
 	if cleanup:
 		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
-		mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=3)
+		mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=4)
 		mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=10)
 	
 	return mask
@@ -96,7 +94,7 @@ def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_range, rect_s
 	# NOTE: Negative numbers have special meaning in slices, so clamp them out here
 	mask[max(0, die_rect[0][1]):max(0, die_rect[1][1]), max(0, die_rect[0][0]):max(0, die_rect[1][0])] = 0
 	outside_mask_count = np.count_nonzero(mask)
-	if outside_mask_count > 0:
+	if outside_mask_count > 10:
 		cv2.imshow('error_mask', mask)
 		print('ERROR: {} pixels outside die rectangle!'.format(outside_mask_count))
 		raise RuntimeException('Die mask data outside rectangle!')
@@ -123,7 +121,7 @@ cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
 DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_value'])
 
-capture_index = 4
+capture_index = 0
 last_capture_index = -1
 test_range = 0
 
@@ -144,7 +142,6 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		#display = cv2.rectangle(display, COMPARTMENT_A_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
 		#display = draw_hsv_range_die_rect(capture_image, display, XWING_GREEN_DIE_HSV_RANGE, DIE_RECT_SIZE)
 		#display = draw_hsv_range_die_rect(capture_image, display, XWING_RED_DIE_HSV_RANGE, DIE_RECT_SIZE)
-		#display = draw_hsv_range_die_rect(capture_image, display, AGE_OF_WAR_DIE_HSV_RANGE, DIE_RECT_SIZE)
 	
 	#test_hsv_range = ((10, 10, 210), (24+test_range, 80, 255))
 	#display = compute_hsv_range_mask(capture_image, test_hsv_range, True)

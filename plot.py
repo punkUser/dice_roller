@@ -1,5 +1,6 @@
 # Settings
 INPUT_FILE = 'output/test2/20181214_144327/C/classified/dice.csv'
+#INPUT_FILE = 'output/test3/20181215_combined/D/classified/dice.csv'
 
 XWING_RED_EXPECTED_DIST = {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0}
 XWING_GREEN_EXPECTED_DIST = {"blank": 3.0/8.0, "focus": 2.0/8.0, "evade": 3.0/8.0}

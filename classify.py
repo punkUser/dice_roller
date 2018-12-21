@@ -1,5 +1,5 @@
 # Settings
-ROOT_DATA_DIR  = 'output/test2/20181214_144327/C/'
+ROOT_DATA_DIR  = 'output/test3/20181215_combined/D/'
 INPUT_MODEL_FILE = 'models/xwing_red.tar'
 INPUT_MODEL_CLASSES = 4			# TODO: Eliminate this...
 INPUT_EXT = '.jpg'
