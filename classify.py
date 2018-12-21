@@ -1,7 +1,7 @@
 # Settings
-ROOT_DATA_DIR  = 'output/test2/20181214_144327/D/'
-INPUT_MODEL_FILE = 'models/xwing_green.tar'
-INPUT_MODEL_CLASSES = 3			# TODO: Eliminate this...
+ROOT_DATA_DIR  = 'output/test2/20181214_144327/C/'
+INPUT_MODEL_FILE = 'models/xwing_red.tar'
+INPUT_MODEL_CLASSES = 4			# TODO: Eliminate this...
 INPUT_EXT = '.jpg'
 COPY_CLASSIFIED_FILES = True
 
