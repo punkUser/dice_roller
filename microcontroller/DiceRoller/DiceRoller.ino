@@ -29,7 +29,7 @@ void setup()
 {
     Serial.begin(9600);
     
-    g_servo.attach(9, 805, 1120);
+    g_servo.attach(9, 810, 1125);
     g_servo.write(k_loadDegrees);
 
     g_previousTimeMs = millis();

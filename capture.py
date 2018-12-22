@@ -1,10 +1,10 @@
 # Settings
-CAPTURE_DIR = 'captured_data/test2/'
+CAPTURE_DIR = 'captured_data/test4/'
 CAPTURE_EXT = '.jpg'
 
 CAPTURE_BOX_START = (90, 90)
 CAPTURE_BOX_END = (840, 600)
-ARDUINO_PORT = 'COM7'
+ARDUINO_PORT = 'COM3'
 
 
 
