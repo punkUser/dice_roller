@@ -26,15 +26,16 @@ class ConvUnit(nn.Module):
 		return output
 
 class Net(nn.Module):
+	# TODO: Support rectangular images?
 	def __init__(self, num_classes, image_dimensions):
 		super(Net, self).__init__()
 
 		# NOTE: Probably a overkill network for our problem but it's fast and it works,
 		# so not much motivation to optimize it down at the moment.
 		
-		self.unit1 = ConvUnit(in_channels=3, out_channels=4)
-		self.unit2 = ConvUnit(in_channels=4, out_channels=4)
-		self.unit3 = ConvUnit(in_channels=4, out_channels=4)
+		self.unit1 = ConvUnit(in_channels=3, out_channels=8)
+		self.unit2 = ConvUnit(in_channels=8, out_channels=8)
+		self.unit3 = ConvUnit(in_channels=8, out_channels=8)
 
 		# In some ways letting the network learn the pooling step via strided convolution is nice,
 		# but in practice MaxPool is somewhat quicker and more consistent for our data set right now.
@@ -44,10 +45,10 @@ class Net(nn.Module):
 		#self.pool1 = nn.Conv2d(in_channels=4, out_channels=4, kernel_size=3, stride=2, padding=1)
 		#self.pool1relu = nn.ReLU();
 
-		self.unit4 = ConvUnit(in_channels=4, out_channels=8)
-		self.unit5 = ConvUnit(in_channels=8, out_channels=8)
-		self.unit6 = ConvUnit(in_channels=8, out_channels=8)
-		self.unit7 = ConvUnit(in_channels=8, out_channels=8)
+		self.unit4 = ConvUnit(in_channels=8, out_channels=16)
+		self.unit5 = ConvUnit(in_channels=16, out_channels=16)
+		self.unit6 = ConvUnit(in_channels=16, out_channels=16)
+		self.unit7 = ConvUnit(in_channels=16, out_channels=16)
 
 		self.pool2 = nn.MaxPool2d(kernel_size=2)
 		#self.pool2 = ConvUnit(in_channels=8, out_channels=8, stride=2)
@@ -58,7 +59,7 @@ class Net(nn.Module):
 
 		 # Two 1/2 size pooling steps
 		dimAfterPooling = int(image_dimensions / 4)
-		self.fcSize = 8 * dimAfterPooling * dimAfterPooling
+		self.fcSize = 16 * dimAfterPooling * dimAfterPooling
 		
 		self.fc = nn.Linear(in_features=self.fcSize, out_features=num_classes)
 

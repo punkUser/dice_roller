@@ -21,7 +21,7 @@ KEY_LEFT  = 2424832
 XWING_GREEN_DIE_HSV_RANGE = (( 60,  30,  60), ( 90, 255, 255))
 XWING_RED_DIE_HSV_RANGE   = ((150,  80,  60), (180, 255, 255))
 
-BLUE_CASINO_DIE_HSV_RANGE = (( 90, 120,  50), (120, 255, 255))
+BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
 WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
 
 XWING_DIE_RECT_SIZE = 84
@@ -37,10 +37,10 @@ COMPARTMENT_D_RECT = ((525, 62), (685, 450))
 # Currently returns dieA, dieB, dieC, dieD
 # NOTE: Each may return "None" if no die is found
 def compute_cropped_die_images(image):
-	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, [WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
 	dieB = crop_hsv_range_die_in_compartment(image, COMPARTMENT_B_RECT, [XWING_GREEN_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
 	dieC = crop_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, [XWING_RED_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, [WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
 	return (dieA, dieB, dieC, dieD)
 
 def capture_imagefile_name(index):
@@ -57,7 +57,8 @@ def save_cropped_die_image(image, compartment, file_name):
 	path = os.path.join('output', CAPTURE_DIR, compartment, 'cropped')
 	if not os.path.exists(path):
 		os.makedirs(path)
-	cv2.imwrite(os.path.join(path, file_name), image)
+	# TODO: probably want some sort of test ID in the file name as well (just simple index)
+	cv2.imwrite(os.path.join(path, "{}_{}".format(compartment, file_name)), image)
 
 # Mask via HSV range filtering (good for colored dice)
 def compute_hsv_range_mask(image, ranges, cleanup = True, open_iterations = 2, close_iterations = 5):
@@ -151,7 +152,7 @@ cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
 DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_value'])
 
-capture_index = 100
+capture_index = 6818
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
@@ -166,7 +167,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = (( 60, test_range,  60), ( 90, 255, 255))
+		test_hsv_range = ((  0,   0, 200), (255,  30+test_range, 255))
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()
@@ -174,10 +175,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_B_RECT[0], COMPARTMENT_C_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_C_RECT[0], COMPARTMENT_B_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_D_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, [WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, [XWING_GREEN_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, [XWING_RED_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, [WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
 		
 		dieA, dieB, dieC, dieD = compute_cropped_die_images(capture_image)
 		

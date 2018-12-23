@@ -1,11 +1,11 @@
 # Settings
-INPUT_FILE = 'output/test2/20181214_144327/C/classified/dice.csv'
-#INPUT_FILE = 'output/test3/20181215_combined/D/classified/dice.csv'
+INPUT_FILE = 'output/captured_data/test4/20181222_113132/D/classified/dice.csv'
 
 XWING_RED_EXPECTED_DIST = {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0}
 XWING_GREEN_EXPECTED_DIST = {"blank": 3.0/8.0, "focus": 2.0/8.0, "evade": 3.0/8.0}
+CASINO_EXPECTED_DIST = {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0}
 # TODO: Improve this
-EXPECTED_DIST = XWING_RED_EXPECTED_DIST
+EXPECTED_DIST = CASINO_EXPECTED_DIST
 
 ###################################################################################################
 import numpy as np
@@ -35,7 +35,7 @@ def plot(title, roll_subplot, chisq_subplot, data, labels):
 		
 	# Roll distribution
 	roll_plot = g_fig.add_subplot(roll_subplot)
-	colors = ['b', 'y', 'g', 'r']	
+	colors = ['b', 'y', 'g', 'r', 'c', 'm', 'k']
 	for i, label in enumerate(labels):
 		roll_plot.plot(x, data_totals[:,i], colors[i] + '-', label="total " + label)
 		roll_plot.plot(x,    expected[:,i], colors[i] + ':', label="expected " + label)
