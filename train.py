@@ -85,12 +85,12 @@ def main():
 	model_output_file = os.path.join("output", DATA + ".tar")
 	model = dice_cnn.Model(class_label_strings, image_dimensions)
 	
-	#model.load(model_output_file) # Continue onwards!
+	model.load(model_output_file) # Continue onwards!
 	
-	model.train(30, train_loader, test_loader)
-	model.save(model_output_file)
-	model.train(30, train_loader, test_loader)
-	model.save(model_output_file)
+	#model.train(30, train_loader, test_loader)
+	#model.save(model_output_file)
+	#model.train(30, train_loader, test_loader)
+	#model.save(model_output_file)
 	#model.train(60, train_loader, test_loader)
 	#model.save(model_output_file)
 	
