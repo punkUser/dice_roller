@@ -1,5 +1,5 @@
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/D/'
+ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/A/'
 INPUT_MODEL_FILE = 'models/casino_blue.tar'
 INPUT_MODEL_CLASSES = 6			# TODO: Eliminate this...
 INPUT_EXT = '.jpg'

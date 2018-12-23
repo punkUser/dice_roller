@@ -11,17 +11,11 @@ EXPECTED_DIST = CASINO_EXPECTED_DIST
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
-
-def plot_data_subset(title, roll_subplot, chisq_subplot, start=0, count=-1, stride=1):
-	raw_start = 1 + start
-	raw_end = -1 if count < 0 else raw_start + count
-	data = np.array(g_raw_data)[raw_start:raw_end:stride,1:].astype(np.float)
-	labels = g_raw_data[0][1:]
-	plot(title, roll_subplot, chisq_subplot, data, labels)
 	
 def plot(title, roll_subplot, chisq_subplot, data, labels):
 	# First dimension is roll #, second is dice label
 	# Cumulative totals of all rolls up until that point
+	data = np.array(data)[:,1:].astype(np.float)
 	data_totals = np.cumsum(data, 0)
 
 	x = np.arange(1, data_totals.shape[0] + 1, 1)
@@ -58,12 +52,23 @@ def plot(title, roll_subplot, chisq_subplot, data, labels):
 	
 if __name__ == "__main__":
 	with open(INPUT_FILE, newline='') as csvfile:
-		g_raw_data = list(csv.reader(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL))
+		raw_data = list(csv.reader(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL))
+	labels = raw_data[0][1:]
+	data = raw_data[1:]
 	
 	g_fig = plt.figure(figsize=(20, 10))
-	plot_data_subset("Roll Distribution", 231, 234, 0, -1, 1)
-	plot_data_subset("Even Rolls",        232, 235, 0, -1, 2)
-	plot_data_subset("Odd Rolls",         233, 236, 1, -1, 2)
+	plot("Roll Distribution", 211, 212, data[0:-1:1], labels)
+	#plot("Even Rolls",        232, 235, data[0:-1:3], labels)
+	#plot("Odd Rolls",         233, 236, data[1:-1:3], labels)
+	
+	# Show distribution of rolls that immediately follows a given roll
+	#g_fig = plt.figure(figsize=(20, 10))
+	#subplot_base = 230
+	#for label_index, label in enumerate(labels[3:6]):
+	#	roll_subplot = subplot_base + label_index + 1
+	#	chisq_subplot = roll_subplot + 3		
+	#	rolls_following_label = [x for i, x in enumerate(data) if i > 1 and int(data[i-1][label_index+1]) > 0]
+	#	plot("Distribution after {}".format(label), roll_subplot, chisq_subplot, rolls_following_label, labels)
 		
 	plt.tight_layout()
 	plt.show()
