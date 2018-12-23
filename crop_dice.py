@@ -1,10 +1,3 @@
-# Settings (need to edit compute_cropped_die_images below for now as well!)
-CAPTURE_DIR = 'captured_data/test4/20181222_113132/'
-INPUT_EXT = '.jpg'
-OUTPUT_EXT = '.jpg'
-
-
-###################################################################################################
 import os
 import numpy as np
 import cv2
@@ -12,20 +5,23 @@ import datetime
 import collections
 import os
 from pathlib import Path
+import die_types
+
+# Settings
+CAPTURE_DIR = 'captured_data/test4/20181222_113132/'
+INPUT_EXT = '.jpg'
+OUTPUT_EXT = '.jpg'
+
+# Compartments ABCD; should match the types in die_types.py
+DIE_TYPES = ["casino_blue", "xwing_green", "xwing_red", "casino_blue"]
+
+
+###################################################################################################
 
 KEY_UP	  = 2490368
 KEY_DOWN  = 2621440
 KEY_RIGHT = 2555904
 KEY_LEFT  = 2424832
-
-XWING_GREEN_DIE_HSV_RANGE = (( 60,  30,  60), ( 90, 255, 255))
-XWING_RED_DIE_HSV_RANGE   = ((150,  80,  60), (180, 255, 255))
-
-BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
-WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
-
-XWING_DIE_RECT_SIZE = 84
-CASINO_DIE_RECT_SIZE = 100
 
 COMPARTMENT_A_RECT = (( 70, 62), (225, 450))
 COMPARTMENT_B_RECT = ((220, 62), (375, 450))
@@ -37,10 +33,10 @@ COMPARTMENT_D_RECT = ((525, 62), (685, 450))
 # Currently returns dieA, dieB, dieC, dieD
 # NOTE: Each may return "None" if no die is found
 def compute_cropped_die_images(image):
-	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
-	dieB = crop_hsv_range_die_in_compartment(image, COMPARTMENT_B_RECT, [XWING_GREEN_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-	dieC = crop_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, [XWING_RED_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_size"])
+	dieB = crop_hsv_range_die_in_compartment(image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_size"])
+	dieC = crop_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_size"])
+	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_size"])
 	return (dieA, dieB, dieC, dieD)
 
 def capture_imagefile_name(index):
@@ -175,10 +171,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_B_RECT[0], COMPARTMENT_C_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_C_RECT[0], COMPARTMENT_B_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_D_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, [XWING_GREEN_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, [XWING_RED_DIE_HSV_RANGE], XWING_DIE_RECT_SIZE)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, [BLUE_CASINO_DIE_HSV_RANGE,WHITE_DOTS_HSV_RANGE], CASINO_DIE_RECT_SIZE)
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_size"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_size"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_size"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_size"])
 		
 		dieA, dieB, dieC, dieD = compute_cropped_die_images(capture_image)
 		
@@ -207,11 +203,12 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		elif key == ord(' '):
 			# Process entire directory batch-style
 			missing_count = [0, 0, 0, 0]		# ABCD
-			
+			total_count = 0
 			file_list = Path(os.path.join(CAPTURE_DIR)).glob('*' + INPUT_EXT)
 			for file in file_list:
 				file_name = os.path.basename(file)
 				print("Processing {}".format(file))
+				total_count += 1
 				batch_image = cv2.imread(str(file))
 				batch_die_a, batch_die_b, batch_die_c, batch_die_d = compute_cropped_die_images(batch_image)
 				# Skip missing dice for now
@@ -235,71 +232,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 				else:
 					missing_count[3] += 1
 			
-			print("Missing dice (A, B, C, D): {}".format(missing_count))
+			print("Scanned {} images. Missing dice (A, B, C, D): {}".format(total_count, missing_count))
 
 cv2.destroyAllWindows()
 
-
-###################################################################################################
-
-
-# find the keypoints and descriptors with ORB
-#orb = cv2.ORB_create(edgeThreshold = 2)
-#img1 = cv2.cvtColor(capture_image, cv2.COLOR_BGR2GRAY) # queryImage
-#img2 = cv2.cvtColor(bowImage, cv2.COLOR_BGR2GRAY) # trainImage
-#kp1, des1 = orb.detectAndCompute(img1,None)
-#kp2, des2 = orb.detectAndCompute(img2,None)
-#bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-#matches = bf.match(des1, des2)
-#matches = sorted(matches, key = lambda x:x.distance)
-#img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:5],None, flags=2)
-
-# Simple color bounding box	
-#kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))
-#minc = cv2.erode(empty0, kernel)
-#maxc = cv2.dilate(empty0, kernel)
-#highPass = cv2.compare(capture_image, minc, cv2.CMP_GE)
-#lowPass = cv2.compare(capture_image, maxc, cv2.CMP_LE)	
-#highPass = cv2.min(highPass[:,:,0], cv2.min(highPass[:,:,1], highPass[:,:,2]))
-#lowPass = cv2.min(lowPass[:,:,0], cv2.min(lowPass[:,:,1], lowPass[:,:,2]))	
-#diffAccum = cv2.multiply(highPass, lowPass)
-
-# Variance version
-#empty0 = empty0.astype('float')
-#filterSize = (15, 15)
-#moment1 = cv2.boxFilter(empty0, -1, filterSize)
-#moment2 = cv2.boxFilter(cv2.multiply(empty0, empty0), -1, filterSize)
-#sigma = cv2.sqrt(cv2.subtract(moment2, cv2.multiply(moment1, moment1)))
-#sigma = sigma * 4	
-#minc = cv2.subtract(moment1, sigma).astype('uint8');
-#maxc = cv2.add(moment1, sigma).astype('uint8');
-
-# RGB distance from background image
-#kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))	
-#height, width, channels = capture_image.shape
-#diffAccum = np.zeros((height, width), np.uint8)
-#diffAccum[:,:] = 255
-#for xOffset in range(-offsetRange, offsetRange+1):
-#	for yOffset in range(-offsetRange, offsetRange+1):
-#		M = np.float32([[1, 0, xOffset],[0, 1, yOffset]])
-#		offsetImage = cv2.warpAffine(empty0, M , (width, height))
-#		
-#		#diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-#		
-#		# RGB euclidean distance
-#		diff = cv2.absdiff(capture_image, offsetImage)
-#		
-#		diff = np.float32(diff)
-#		diff = cv2.multiply(diff, diff)
-#		diff = cv2.add(diff[:,:,0], cv2.add(diff[:,:,1], diff[:,:,2]))
-#		diff = cv2.sqrt(diff)
-#		ret,diff = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)
-#		diff = np.uint8(diff)
-		
-#		diff = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel, iterations=5)
-#		diff = cv2.morphologyEx(diff, cv2.MORPH_CLOSE, kernel, iterations=5)
-#		diff = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel, iterations=10)
-		#diff = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel, iterations=2)
-		
-#		diffAccum = cv2.min(diff, diffAccum)
-#diffAccum = cv2.bitwise_and(capture_image,capture_image,mask = diffAccum)

@@ -1,13 +1,3 @@
-# Settings
-ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/A/'
-INPUT_MODEL_FILE = 'models/casino_blue.tar'
-INPUT_MODEL_CLASSES = 6			# TODO: Eliminate this...
-INPUT_EXT = '.jpg'
-COPY_CLASSIFIED_FILES = True
-
-###################################################################################################
-import dice_cnn
-
 import torchvision.datasets
 import torchvision.transforms
 import torch.utils.data
@@ -17,6 +7,16 @@ import PIL
 import shutil
 import csv
 from pathlib import Path
+import dice_cnn
+import die_types
+
+# Settings
+ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/A/'
+INPUT_EXT = '.jpg'
+DIE_TYPE = "casino_blue"
+COPY_CLASSIFIED_FILES = True
+
+###################################################################################################
 
 # From torchvision
 def pil_loader(path):
@@ -65,9 +65,8 @@ def main():
 	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
 		
 	# TODO: Sort out this workaround for class label timing... dependency is only on the # of classes really
-	image_dimensions = images[0].shape[2]
-	model = dice_cnn.Model([str(x) for x in range(INPUT_MODEL_CLASSES)], image_dimensions)
-	model.load(INPUT_MODEL_FILE)
+	model = dice_cnn.Model([str(x) for x in range(die_types.params[DIE_TYPE]["classes_count"])], die_types.params[DIE_TYPE]["rect_size"])
+	model.load(os.path.join("models", DIE_TYPE + ".tar"))
 	class_labels = model.get_class_labels()
 	
 	# Ensure output directories exist, but delete any image files (to avoid merging with previous run data)

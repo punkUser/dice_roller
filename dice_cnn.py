@@ -36,7 +36,7 @@ class ConvUnit(nn.Module):
 
 class Net(nn.Module):
 	# TODO: Support rectangular images?
-	def __init__(self, num_classes, image_dimensions):
+	def __init__(self, classes_count, image_dimensions):
 		super(Net, self).__init__()
 
 		# NOTE: Probably a overkill network for our problem but it's fast and it works,
@@ -70,7 +70,7 @@ class Net(nn.Module):
 		dimAfterPooling = int(image_dimensions / 4)
 		self.fcSize = 16 * dimAfterPooling * dimAfterPooling
 		
-		self.fc = nn.Linear(in_features=self.fcSize, out_features=num_classes)
+		self.fc = nn.Linear(in_features=self.fcSize, out_features=classes_count)
 
 	def forward(self, input):
 		output = self.net(input)
