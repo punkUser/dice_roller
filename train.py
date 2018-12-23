@@ -1,5 +1,5 @@
 # Settings
-DATA = "xwing_red"
+DATA = "casino_blue"
 
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
 BATCH_SIZE = 16
@@ -56,7 +56,7 @@ class CasinoImgTransform:
 def main():
 	# Training data
 	train_transform = torchvision.transforms.Compose([
-		XwingImgTransform(),
+		CasinoImgTransform(),
 		torchvision.transforms.ToTensor(),
 		torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 	])	
