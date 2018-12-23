@@ -1,10 +1,19 @@
 import torch
 import torch.nn as nn
 import torch.optim
+import torchvision.datasets
 import numpy as np
 import matplotlib.pyplot as plt
 from imgaug import augmenters as iaa
 import imgaug
+
+# Add paths to the return value of ImageFolders; useful for user output/messages
+class ImageFolderWithPaths(torchvision.datasets.ImageFolder):
+    def __getitem__(self, index):
+        original_tuple = super(ImageFolderWithPaths, self).__getitem__(index)
+        path = self.imgs[index][0]
+        tuple_with_path = (original_tuple + (path,))
+        return tuple_with_path
 
 def show_tensor_image(img):
 	img = img / 2 + 0.5		# unnormalize
@@ -124,11 +133,12 @@ class Model:
 		_, predicted = torch.max(outputs.data, 1)
 		return predicted
 		
+	# TODO: Pull loader loop outside of this class likely
 	def test(self, loader, show_error_images = False):
 		self.model.eval()
 		correct = 0
 		total = 0
-		for images, labels in loader:
+		for images, labels, path in loader:
 			images, labels = images.to(self.device), labels.to(self.device)
 
 			# Predict classes using images from the test set
@@ -147,14 +157,15 @@ class Model:
 					
 				for i in range(len(predicted)):
 					if predicted[i] != labels[i]:
-						print("Index ~{} Predicted {}, expected {}. Weights {}".format(total, self.class_labels[predicted[i]], self.class_labels[labels[i]], outputs.data[i]))
+						print("{}: Predicted {}, expected {}. Weights {}".format(path[i], self.class_labels[predicted[i]], self.class_labels[labels[i]], outputs.data[i]))
 						show_tensor_image(images[i].cpu())
 
 		test_acc = correct / total
 		return test_acc
-		
+	
+	# TODO: Pull loader loop outside of this class likely
 	def train(self, numEpochs, train_loader, test_loader):
-		for localEpoch in range(numEpochs):			
+		for localEpoch in range(numEpochs):
 			# Update epoch-based optimizer learning rate
 			self.scheduler.step()
 			self.model.train()
@@ -162,7 +173,7 @@ class Model:
 			total = 0
 			train_accuracy = 0
 			train_loss = 0
-			for images, labels in train_loader:
+			for images, labels, path in train_loader:
 				# Move images and labels to gpu if available
 				images, labels = images.to(self.device), labels.to(self.device)
 

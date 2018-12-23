@@ -39,7 +39,7 @@ class Dataset(torch.utils.data.Dataset):
 		self.transform = transform
 
 	def __getitem__(self, index):
-		path = self.image_paths[index]		
+		path = self.image_paths[index]
 		image = self.loader(path)
 		if self.transform is not None:
 			image = self.transform(image)
@@ -70,13 +70,18 @@ def main():
 	model.load(INPUT_MODEL_FILE)
 	class_labels = model.get_class_labels()
 	
-	# Ensure output directories exist
+	# Ensure output directories exist, but delete any image files (to avoid merging with previous run data)
 	output_dir = os.path.join(ROOT_DATA_DIR, 'classified')
 	if COPY_CLASSIFIED_FILES:
 		for class_label in class_labels:
 			path = os.path.join(output_dir, class_label)
 			if not os.path.exists(path):
 				os.makedirs(path)
+			else:
+				# Remove any image files first
+				for file in Path(path).glob('*' + INPUT_EXT):
+					os.remove(file)
+				
 
 	# TODO Maybe give it a name based on the path instead so it could be moved to same dir as others
 	csv_file = open(os.path.join(output_dir, "dice.csv"), mode='w', newline='')
