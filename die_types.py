@@ -30,15 +30,15 @@ class CasinoImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
 			imgaug.augmenters.Sometimes(0.75, imgaug.augmenters.Affine(
-				scale = (0.8, 1.1),
-				translate_percent = {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
+				scale = (0.8, 1.2),
+				translate_percent = {"x": (-0.25, 0.25), "y": (-0.25, 0.25)},
 				rotate = (0, 360),
 				order = 1,
 				cval = (0, 255),
 			)),
 			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
 			imgaug.augmenters.AddToHueAndSaturation((-5, 5)),
-			imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
+			imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.02*255), per_channel = 0.5)
 		])
 
 	def __call__(self, img):
