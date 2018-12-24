@@ -71,6 +71,10 @@ def compute_hsv_range_mask(image, ranges, cleanup = True, open_iterations = 2, c
 		mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=close_iterations)
 	
 	return mask
+
+def compare_images(image1, image2):
+	delta = cv2.absdiff(image1, image2)
+	return np.mean(delta)
 	
 def compute_mask_center(mask):
 	maskMoments = cv2.moments(mask, True);
@@ -100,10 +104,11 @@ def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_
 	# NOTE: Negative numbers have special meaning in slices, so clamp them out here
 	mask[max(0, die_rect[0][1]):max(0, die_rect[1][1]), max(0, die_rect[0][0]):max(0, die_rect[1][0])] = 0
 	outside_mask_count = np.count_nonzero(mask)
-	if outside_mask_count > 20:
+	fraction_outside = outside_mask_count / mask_pixels
+	if fraction_outside > 0.15:
 		# Allow to fall through since this is often a non-critical error
 		#cv2.imshow('error_mask', mask)
-		print('ERROR: {} pixels outside die rectangle!'.format(outside_mask_count))
+		print('WARNING: {}% pixels outside die rectangle!'.format(fraction_outside * 100.0))
 	
 	die_rect_absolute = ((die_rect[0][0]+compartment_rect[0][0],die_rect[0][1]+compartment_rect[0][1]), (die_rect[1][0]+compartment_rect[0][0],die_rect[1][1]+compartment_rect[0][1]))
 	
@@ -204,13 +209,23 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			# Process entire directory batch-style
 			missing_count = [0, 0, 0, 0]		# ABCD
 			total_count = 0
+			last_image = None
 			file_list = Path(os.path.join(CAPTURE_DIR)).glob('*' + INPUT_EXT)
-			for file in file_list:
+			for i, file in enumerate(file_list):
 				file_name = os.path.basename(file)
-				print("Processing {}".format(file))
+				if (i % 1000 == 0):
+					print("Processing {}".format(file))
 				total_count += 1
-				batch_image = cv2.imread(str(file))
-				batch_die_a, batch_die_b, batch_die_c, batch_die_d = compute_cropped_die_images(batch_image)
+								
+				batch_image = cv2.imread(str(file))				
+				if last_image is not None:
+					last_image_delta = compare_images(last_image, batch_image)
+					if (last_image_delta < 5):
+						print("WARNING: Potentially duplicate image detected {}. (Delta = {})".format(file, last_image_delta))
+				last_image = batch_image
+				
+				batch_die_a, batch_die_b, batch_die_c, batch_die_d = compute_cropped_die_images(batch_image)				
+				
 				# Skip missing dice for now
 				if batch_die_a is not None:
 					save_cropped_die_image(batch_die_a, 'A', file_name)

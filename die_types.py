@@ -51,12 +51,14 @@ params = {
 		"hsv_ranges": [XWING_RED_DIE_HSV_RANGE],
 		"rect_size": 84,
 		"classes_count": 4,			# blank, focus, hit, crit
+		"expected_distribution": {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0},
 		"train_image_transform": XwingImgTransform(),
 	},
 	"xwing_green": {
 		"hsv_ranges": [XWING_GREEN_DIE_HSV_RANGE],
 		"rect_size": 84,
 		"classes_count": 3,			# blank, focus, evade
+		"expected_distribution": {"blank": 3.0/8.0, "focus": 2.0/8.0, "evade": 3.0/8.0},
 		"train_image_transform": XwingImgTransform(),
 	},
 	"casino_blue": {
@@ -64,5 +66,6 @@ params = {
 		"rect_size": 100,
 		"classes_count": 6,			# 1-6
 		"train_image_transform": CasinoImgTransform(),
+		"expected_distribution": {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0},
 	},
 }

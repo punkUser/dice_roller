@@ -11,10 +11,10 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/A/'
-INPUT_EXT = '.jpg'
-DIE_TYPE = "casino_blue"
+ROOT_DATA_DIR  = 'output/captured_data/test4/20181222_113132/B/'
+DIE_TYPE = "xwing_green"
 COPY_CLASSIFIED_FILES = True
+INPUT_EXT = '.jpg'
 
 ###################################################################################################
 
