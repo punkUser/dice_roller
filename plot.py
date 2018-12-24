@@ -60,9 +60,9 @@ if __name__ == "__main__":
 	data = raw_data[1:]
 	
 	g_fig = plt.figure(figsize=(20, 10))
-	plot("Roll Distribution", 231, 234, data[0:-1:1], labels, True)
-	plot("Even Rolls",        232, 235, data[0:-1:2], labels)
-	plot("Odd Rolls",         233, 236, data[1:-1:2], labels)
+	plot("Roll Distribution", 211, 212, data[0:-1:1], labels, True)
+	#plot("Even Rolls",        232, 235, data[0:-1:2], labels)
+	#plot("Odd Rolls",         233, 236, data[1:-1:2], labels)
 	
 	# Show distribution of rolls that immediately follows a given roll
 	#rolls_following_plot_count = min(3, len(labels))
