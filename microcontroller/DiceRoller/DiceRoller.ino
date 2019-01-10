@@ -2,12 +2,15 @@
 
 //---------------------------------------------------------------------------------------------
 
-static const int k_commandNone      = 0;
-static const int k_commandUp        = 1;
-static const int k_commandDown      = 2;
-static const int k_commandLoad      = 3;
-static const int k_commandCycle     = 4;
-static const int k_commandCycleDone = 5;
+static const int k_commandNone            = 0;
+static const int k_commandUp              = 1;
+static const int k_commandDown            = 2;
+static const int k_commandLoad            = 3;
+static const int k_commandCycle           = 4;
+static const int k_commandCycleDone       = 5;
+static const int k_commandRangeTestUp     = 6;
+static const int k_commandRangeTestDown   = 7;
+static const int k_commandRangeTestValue  = 8;
 
 static const int k_upDegrees      = 0;
 static const int k_downDegrees    = 180;
@@ -22,6 +25,8 @@ static unsigned long g_previousTimeMs = 0;
 static bool g_cycleUpNext = false;
 static unsigned long g_timeSinceCycleStartMs = k_cycleTimeMs;
 
+static int g_rangeTestMs = 1500;
+
 
 //---------------------------------------------------------------------------------------------
 
@@ -29,7 +34,7 @@ void setup()
 {
     Serial.begin(9600);
     
-    g_servo.attach(9, 810, 1125);
+    g_servo.attach(9, 1000, 2000);
     g_servo.write(k_loadDegrees);
 
     g_previousTimeMs = millis();
@@ -76,7 +81,7 @@ void loop()
             {
                 // Ignore if cycle is currently still happening
                 if (g_timeSinceCycleStartMs >= k_cycleTimeMs)
-                {                    
+                {
                     if (g_cycleUpNext)
                         g_servo.write(k_upDegrees);
                     else
@@ -86,11 +91,25 @@ void loop()
                     g_cycleUpNext = !g_cycleUpNext;
                 }
             }
+            else if (command == k_commandRangeTestUp)
+            {
+                g_timeSinceCycleStartMs = k_cycleTimeMs;
+                g_rangeTestMs += 10;
+                g_servo.write(g_rangeTestMs);
+                Serial.write(k_commandRangeTestValue);
+                Serial.write(g_rangeTestMs / 10);   // 8 bit, good up to 2550ms
+            }
+            else if (command == k_commandRangeTestDown)
+            {
+                g_timeSinceCycleStartMs = k_cycleTimeMs;
+                g_rangeTestMs -= 10;
+                g_servo.write(g_rangeTestMs);
+                Serial.write(k_commandRangeTestValue);
+                Serial.write(g_rangeTestMs / 10);   // 8 bit, good up to 2550ms
+            }
         }
     }
 
-    
-
-    // Don't really need to be hammering the CPU/latency for this use...
-    delay(10);
+    // Don't really need to be hammering the CPU/latency for this use; leave time for servo interrupts
+    delay(100);
 }

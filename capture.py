@@ -4,7 +4,7 @@ CAPTURE_EXT = '.jpg'
 
 CAPTURE_BOX_START = (90, 90)
 CAPTURE_BOX_END = (840, 600)
-ARDUINO_PORT = 'COM3'
+ARDUINO_PORT = 'COM7'
 
 
 
@@ -22,6 +22,9 @@ COMMAND_DOWN       = 2
 COMMAND_LOAD       = 3
 COMMAND_CYCLE      = 4
 COMMAND_CYCLE_DONE = 5
+COMMAND_RANGE_TEST_UP = 6
+COMMAND_RANGE_TEST_DOWN = 7
+COMMAND_RANGE_TEST_VALUE = 8
 
 KEY_UP    = 2490368
 KEY_DOWN  = 2621440
@@ -108,6 +111,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			arduinoSerial.write(COMMAND_LOAD)
 		elif key == ord(' '):
 			arduinoSerial.write(COMMAND_CYCLE)
+		elif key == ord('+'):
+			arduinoSerial.write(COMMAND_RANGE_TEST_UP)
+		elif key == ord('-'):
+			arduinoSerial.write(COMMAND_RANGE_TEST_DOWN)
 			
 	# Handle incoming commands
 	if (arduinoSerial.readAvailable()):
@@ -119,6 +126,13 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			
 			# Auto-continue with next cycle
 			arduinoSerial.write(COMMAND_CYCLE)
+		
+		elif (command == COMMAND_RANGE_TEST_VALUE):
+			# Next value to come is the value
+			while (not arduinoSerial.readAvailable()):
+				pass
+			value = arduinoSerial.read();	# NOTE: Divided by 10 so we can get up to 2550 in 1 byte
+			print("Range test value: {}ms".format(value * 10))
 	
 cap.release()
 cv2.destroyAllWindows()
