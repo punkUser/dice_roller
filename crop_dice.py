@@ -8,12 +8,12 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/test4/20181222_113132/'
+CAPTURE_DIR = 'captured_data/xr1_cd19_cd20_xg10/20190113_150310/'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["casino_blue", "xwing_green", "xwing_red", "casino_blue"]
+DIE_TYPES = ["xwing_red", "casino_blue", "casino_blue", "xwing_green"]
 
 
 ###################################################################################################
@@ -153,7 +153,7 @@ cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
 DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_value'])
 
-capture_index = 6818
+capture_index = 0
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
@@ -168,7 +168,9 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((  0,   0, 200), (255,  30+test_range, 255))
+		#test_hsv_range = ((  0,   0, 200), (255,  30+test_range, 255))
+		#test_hsv_range = (( 90, 130,  35), (120, 255, 255))
+		test_hsv_range = ((  60+test_range,   0, 230), (255,  30, 255))
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()
@@ -224,7 +226,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 						print("WARNING: Potentially duplicate image detected {}. (Delta = {})".format(file, last_image_delta))
 				last_image = batch_image
 				
-				batch_die_a, batch_die_b, batch_die_c, batch_die_d = compute_cropped_die_images(batch_image)				
+				batch_die_a, batch_die_b, batch_die_c, batch_die_d = compute_cropped_die_images(batch_image)
 				
 				# Skip missing dice for now
 				if batch_die_a is not None:

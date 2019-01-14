@@ -62,7 +62,7 @@ params = {
 		"train_image_transform": XwingImgTransform(),
 	},
 	"casino_blue": {
-		"hsv_ranges": [BLUE_CASINO_DIE_HSV_RANGE, WHITE_DOTS_HSV_RANGE],
+		"hsv_ranges": [BLUE_CASINO_DIE_HSV_RANGE],
 		"rect_size": 100,
 		"classes_count": 6,			# 1-6
 		"train_image_transform": CasinoImgTransform(),

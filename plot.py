@@ -4,8 +4,8 @@ import csv
 import die_types
 
 # Settings
-INPUT_FILE = 'output/captured_data/test4/20181222_113132/B/classified/dice.csv'
-DIE_TYPE = "xwing_green"
+INPUT_FILE = 'output/captured_data/test5/xr1_cd19_cd20_xg10/B/classified/dice.csv'
+DIE_TYPE = "casino_blue"
 
 ###################################################################################################
 
