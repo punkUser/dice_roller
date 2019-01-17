@@ -8,12 +8,12 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr1_cd19_cd20_xg10/20190113_150310/'
+CAPTURE_DIR = 'captured_data/xr2_xr3_xr4_xr5/20190116_140506/'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["xwing_red", "casino_blue", "casino_blue", "xwing_green"]
+DIE_TYPES = ["xwing_red", "xwing_red", "xwing_red", "xwing_red"]
 
 
 ###################################################################################################
@@ -24,9 +24,9 @@ KEY_RIGHT = 2555904
 KEY_LEFT  = 2424832
 
 COMPARTMENT_A_RECT = (( 70, 62), (225, 450))
-COMPARTMENT_B_RECT = ((220, 62), (375, 450))
-COMPARTMENT_C_RECT = ((380, 62), (535, 450))
-COMPARTMENT_D_RECT = ((525, 62), (685, 450))
+COMPARTMENT_B_RECT = ((210, 62), (365, 450))
+COMPARTMENT_C_RECT = ((360, 62), (515, 450))
+COMPARTMENT_D_RECT = ((505, 62), (665, 450))
 
 ###################################################################################################
 
@@ -169,9 +169,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 
 	if tuning_ranges:
 		#test_hsv_range = ((  0,   0, 200), (255,  30+test_range, 255))
-		#test_hsv_range = (( 90, 130,  35), (120, 255, 255))
-		test_hsv_range = ((  60+test_range,   0, 230), (255,  30, 255))
-		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
+		#test_hsv_range = ((150,  80,  60), (180, 255, 255))
+		test_hsv_range = ((0,  140, 60+test_range), (10, 255, 255))
+		test_hsv_range_2 = ((150,  80, 60), (180, 255, 255))
+		display = compute_hsv_range_mask(capture_image, [test_hsv_range, test_hsv_range_2], False)
 	else:
 		rect_display = capture_image.copy()
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_A_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)

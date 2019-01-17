@@ -2,7 +2,9 @@ import imgaug
 import numpy as np
 
 XWING_GREEN_DIE_HSV_RANGE = (( 60,  30,  60), ( 90, 255, 255))
-XWING_RED_DIE_HSV_RANGE   = ((150,  80,  60), (180, 255, 255))
+
+XWING_RED_DIE_HSV_RANGE_1 = ((  0, 140,  60), ( 10, 255, 255))
+XWING_RED_DIE_HSV_RANGE_2 = ((150,  80,  60), (180, 255, 255))
 
 BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
 WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
@@ -18,7 +20,7 @@ class XwingImgTransform:
 				cval = (0, 255),
 			),
 			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
+			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
 			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
 		])
 
@@ -48,7 +50,7 @@ class CasinoImgTransform:
 # NOTE: Could use namedtuples for each of the elements here, but good enough for now
 params = {
 	"xwing_red": {
-		"hsv_ranges": [XWING_RED_DIE_HSV_RANGE],
+		"hsv_ranges": [XWING_RED_DIE_HSV_RANGE_1, XWING_RED_DIE_HSV_RANGE_2],
 		"rect_size": 84,
 		"classes_count": 4,			# blank, focus, hit, crit
 		"expected_distribution": {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0},
