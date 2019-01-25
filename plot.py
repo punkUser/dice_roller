@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import die_types
+import os.path;
 
 # Settings
-INPUT_FILE = 'output/captured_data/xr1_cd19_cd20_xg10/20190113_150310/D/classified/dice.csv'
-DIE_TYPE = "xwing_green"
+INPUT_FILE = "results/casino_blue/cb_run1_compartmentB.csv"
+DIE_TYPE = "casino_blue"
 
 ###################################################################################################
 
@@ -16,19 +17,21 @@ def plot(title, roll_subplot, chisq_subplot, data, labels, print_totals = False)
 	data_totals = np.cumsum(data, 0)
 
 	x = np.arange(1, data_totals.shape[0] + 1, 1)
-	
-	if print_totals:
-		print("Total rolls: {}".format(data_totals.shape[0]))
-	
+		
 	expected = np.zeros_like(data_totals)
 	expected_distribution = die_types.params[DIE_TYPE]["expected_distribution"]
 	for i, label in enumerate(labels):
-		expected[:,i] = expected_distribution[label] * x		
-		if print_totals:
-			print("{}: Got {}, expected {} (delta {})".format(label, data_totals[-1,i], expected[-1,i], data_totals[-1,i] - expected[-1,i]))
+		expected[:,i] = expected_distribution[label] * x
 	
 	error_squared = np.square(data_totals - expected) / expected
 	chi_squared = np.sum(error_squared, 1)
+	
+	if print_totals:
+		print("{}".format(INPUT_FILE))
+		print("total rolls: {}".format(data_totals.shape[0]))
+		print("chi squared: {}".format(chi_squared[-1]))
+		for i, label in enumerate(labels):
+			print("{}: Got {}, expected {} (delta {})".format(label, data_totals[-1,i], expected[-1,i], data_totals[-1,i] - expected[-1,i]))
 		
 	# Roll distribution
 	roll_plot = g_fig.add_subplot(roll_subplot)
@@ -47,7 +50,7 @@ def plot(title, roll_subplot, chisq_subplot, data, labels, print_totals = False)
 	chisq_plot = g_fig.add_subplot(chisq_subplot)
 	chisq_plot.plot(x, chi_squared, 'b-')
 	chisq_plot.set_xlim(left=1, right=x[-1])
-	chisq_plot.set_ylim(bottom=0, top=20)
+	#chisq_plot.set_ylim(bottom=0, top=20)
 	chisq_plot.set_xlabel('roll')
 	chisq_plot.set_ylabel('Chi Squared')
 	#chisq_plot.set_title('Chi Squared')
@@ -59,7 +62,7 @@ if __name__ == "__main__":
 	labels = raw_data[0][1:]
 	data = raw_data[1:]
 	
-	g_fig = plt.figure(figsize=(20, 10))
+	g_fig = plt.figure(figsize=(15, 8))
 	plot("Roll Distribution", 211, 212, data[0:-1:1], labels, True)
 	#plot("Even Rolls",        232, 235, data[0:-1:2], labels)
 	#plot("Odd Rolls",         233, 236, data[1:-1:2], labels)
@@ -75,4 +78,5 @@ if __name__ == "__main__":
 	#	plot("Distribution after {}".format(label), roll_subplot, chisq_subplot, rolls_following_label, labels)
 		
 	plt.tight_layout()
+	g_fig.savefig(os.path.splitext(INPUT_FILE)[0] + '.png')
 	plt.show()

@@ -8,7 +8,7 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr2_xr3_xr4_xr5/20190116_140506/'
+CAPTURE_DIR = 'captured_data/xr5_xr4_xr3_xr2/20190123_163445/'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
@@ -233,21 +233,25 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 				if batch_die_a is not None:
 					save_cropped_die_image(batch_die_a, 'A', file_name)
 				else:
+					print("Missing compartment A in {}".format(file))
 					missing_count[0] += 1
 				
 				if batch_die_b is not None:
 					save_cropped_die_image(batch_die_b, 'B', file_name)
 				else:
+					print("Missing compartment B in {}".format(file))
 					missing_count[1] += 1
 					
 				if batch_die_c is not None:
 					save_cropped_die_image(batch_die_c, 'C', file_name)
 				else:
+					print("Missing compartment C in {}".format(file))
 					missing_count[2] += 1
 					
 				if batch_die_d is not None:
 					save_cropped_die_image(batch_die_d, 'D', file_name)
 				else:
+					print("Missing compartment D in {}".format(file))
 					missing_count[3] += 1
 			
 			print("Scanned {} images. Missing dice (A, B, C, D): {}".format(total_count, missing_count))
