@@ -5,8 +5,8 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/casino_blue/cb_run1_compartmentB.csv"
-DIE_TYPE = "casino_blue"
+INPUT_FILE = "results/xwing_red/xr9_run1_compartmentD.csv"
+DIE_TYPE = "xwing_red"
 
 ###################################################################################################
 

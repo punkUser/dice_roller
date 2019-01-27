@@ -11,7 +11,7 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/xr5_xr4_xr3_xr2/20190123_163445/D/'
+ROOT_DATA_DIR  = 'output/captured_data/xr6_xr7_xr8_xr9/20190125_101849/D/'
 DIE_TYPE = "xwing_red"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'
@@ -61,8 +61,8 @@ def main():
 	print("Input set size: {}".format(len(test_set)))
 	
 	# DEBUG
-	images = iter(test_loader).next()
-	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
+	#images = iter(test_loader).next()
+	#dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
 		
 	# TODO: Sort out this workaround for class label timing... dependency is only on the # of classes really
 	model = dice_cnn.Model([str(x) for x in range(die_types.params[DIE_TYPE]["classes_count"])], die_types.params[DIE_TYPE]["rect_size"])
