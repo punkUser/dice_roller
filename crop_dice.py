@@ -8,7 +8,7 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xg2_xg3_xg4_xg5/20190127_100632/'
+CAPTURE_DIR = 'captured_data/xg6_xg7_xg8_xg9/20190129_111834/'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
