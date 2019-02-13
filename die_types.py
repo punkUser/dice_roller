@@ -58,11 +58,10 @@ class AgeOfWarImgTransform:
 				order = 1,
 				cval = (0, 255),
 			)),
-			imgaug.augmenters.Fliplr(0.5),
-			imgaug.augmenters.Flipud(0.5),
-			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
+			#imgaug.augmenters.Fliplr(0.5),
+			#imgaug.augmenters.Flipud(0.5),
+			#imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
 			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
-			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
 		])
 
 	def __call__(self, img):
