@@ -47,27 +47,62 @@ class CasinoImgTransform:
 		img = np.array(img)
 		return self.aug.augment_image(img)
 
+class AgeOfWarImgTransform:
+	def __init__(self):
+		self.aug = imgaug.augmenters.Sequential([
+			# We can't do a ton of geometry manipulation given we're using the whole compartment image currently
+			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Affine(
+				scale = (0.9, 1.0),
+				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+				rotate = (-5, 5),
+				order = 1,
+				cval = (0, 255),
+			)),
+			imgaug.augmenters.Fliplr(0.5),
+			imgaug.augmenters.Flipud(0.5),
+			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
+			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
+			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
+		])
+
+	def __call__(self, img):
+		img = np.array(img)
+		return self.aug.augment_image(img)
+		
 # NOTE: Could use namedtuples for each of the elements here, but good enough for now
 params = {
 	"xwing_red": {
 		"hsv_ranges": [XWING_RED_DIE_HSV_RANGE_1, XWING_RED_DIE_HSV_RANGE_2],
-		"rect_size": 84,
+		"rect_width": 84,
+		"rect_height": 84,
 		"classes_count": 4,			# blank, focus, hit, crit
 		"expected_distribution": {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0},
 		"train_image_transform": XwingImgTransform(),
 	},
 	"xwing_green": {
 		"hsv_ranges": [XWING_GREEN_DIE_HSV_RANGE],
-		"rect_size": 84,
+		"rect_width": 84,
+		"rect_height": 84,
 		"classes_count": 3,			# blank, focus, evade
 		"expected_distribution": {"blank": 3.0/8.0, "focus": 2.0/8.0, "evade": 3.0/8.0},
 		"train_image_transform": XwingImgTransform(),
 	},
 	"casino_blue": {
 		"hsv_ranges": [BLUE_CASINO_DIE_HSV_RANGE],
-		"rect_size": 100,
+		"rect_width": 100,
+		"rect_height": 100,
 		"classes_count": 6,			# 1-6
 		"train_image_transform": CasinoImgTransform(),
 		"expected_distribution": {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0},
 	},
+	"age_of_war": {
+		# We don't try and crop the age of war dice since their colors are hard to separate from the background.
+		# Instead we'll let the machine learning handle finding the die and identifying it in the image. Less efficient, but simpler for now.
+		"hsv_ranges": [((0, 0, 0), (255, 255, 255))],
+		"rect_width": 155,
+		"rect_height": 388,
+		"classes_count": 6,
+		"train_image_transform": AgeOfWarImgTransform(), # for now
+		"expected_distribution": {"1sword": 1.0/6.0, "2sword": 1.0/6.0, "3sword": 1.0/6.0, "bow": 1.0/6.0, "horse": 1.0/6.0, "mask": 1.0/6.0},
+	}
 }

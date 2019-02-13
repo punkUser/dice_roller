@@ -7,7 +7,7 @@ import dice_cnn
 import die_types
 
 # Settings
-DIE_TYPE = "xwing_red"
+DIE_TYPE = "age_of_war"
 
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
 BATCH_SIZE = 16
@@ -41,13 +41,13 @@ def main():
 	images, labels, paths = iter(train_loader).next()
 	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:16], nrow = 4))
 	
-	# Use the dimensions of the first image as representative	
-	image_dimensions = images[0].shape[1]
+	# Use the dimensions of the first image as representative
 	model_output_file = os.path.join("output", DIE_TYPE + ".tar")
-	model = dice_cnn.Model(class_label_strings, image_dimensions)
+	model = dice_cnn.Model(class_label_strings, images[0].shape[2], images[0].shape[1],
+						   lr = 0.005, momentum = 0.9, lr_reduction_steps = 100)
 	
 	#model.load(model_output_file) # Continue onwards!
-	model.train(60, train_loader, test_loader)
+	model.train(200, train_loader, test_loader)
 	model.save(model_output_file)
 	
 	# Final test and display of mispredicted ones

@@ -36,7 +36,7 @@ class ConvUnit(nn.Module):
 
 class Net(nn.Module):
 	# TODO: Support rectangular images?
-	def __init__(self, classes_count, image_dimensions):
+	def __init__(self, classes_count, image_width, image_height):
 		super(Net, self).__init__()
 
 		# NOTE: Probably a overkill network for our problem but it's fast and it works,
@@ -67,8 +67,9 @@ class Net(nn.Module):
 								 self.unit4, self.unit5, self.unit6, self.unit7, self.pool2)
 
 		 # Two 1/2 size pooling steps
-		dimAfterPooling = int(image_dimensions / 4)
-		self.fcSize = 16 * dimAfterPooling * dimAfterPooling
+		widthAfterPooling = int(image_width / 4)
+		heightAfterPooling = int(image_height / 4)
+		self.fcSize = 16 * widthAfterPooling * heightAfterPooling
 		
 		self.fc = nn.Linear(in_features=self.fcSize, out_features=classes_count)
 
@@ -80,7 +81,7 @@ class Net(nn.Module):
 		return output
 
 class Model:
-	def __init__(self, class_labels, image_dimensions):
+	def __init__(self, class_labels, image_width, image_height, lr = 0.01, momentum = 0.9, lr_reduction_steps = 20):
 		self.class_labels = class_labels
 		self.epoch = 0
 	
@@ -88,11 +89,11 @@ class Model:
 		print("Device: {}".format(self.device))
 					
 		# Create model, optimizer and loss function
-		self.model = Net(len(self.class_labels), image_dimensions)
+		self.model = Net(len(self.class_labels), image_width, image_height)
 		self.model.to(self.device)
 
-		self.optimizer    = torch.optim.SGD(self.model.parameters(), lr = 0.01, momentum = 0.9)
-		self.scheduler    = torch.optim.lr_scheduler.StepLR(self.optimizer, 20,	gamma = 0.1)
+		self.optimizer    = torch.optim.SGD(self.model.parameters(), lr = lr, momentum = momentum)
+		self.scheduler    = torch.optim.lr_scheduler.StepLR(self.optimizer, lr_reduction_steps,	gamma = 0.1)
 		self.loss_function = nn.CrossEntropyLoss()
 
 	def get_class_labels(self):

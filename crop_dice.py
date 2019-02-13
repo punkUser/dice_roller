@@ -8,12 +8,12 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xg10_xg11_xg12_xg13/20190202_091946/'
+CAPTURE_DIR = 'captured_data/aow1_aow2_aow3_aow4/20190205_095311/'
 INPUT_EXT = '.jpg'
 OUTPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["xwing_green", "xwing_green", "xwing_green", "xwing_green"]
+DIE_TYPES = ["age_of_war", "age_of_war", "age_of_war", "age_of_war"]
 
 
 ###################################################################################################
@@ -23,20 +23,20 @@ KEY_DOWN  = 2621440
 KEY_RIGHT = 2555904
 KEY_LEFT  = 2424832
 
-COMPARTMENT_A_RECT = (( 70, 62), (225, 450))
-COMPARTMENT_B_RECT = ((210, 62), (365, 450))
-COMPARTMENT_C_RECT = ((360, 62), (515, 450))
-COMPARTMENT_D_RECT = ((505, 62), (665, 450))
+COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
+COMPARTMENT_B_RECT = ((210, 62), (365, 450)) # 155x388
+COMPARTMENT_C_RECT = ((360, 62), (515, 450)) # 155x388
+COMPARTMENT_D_RECT = ((505, 62), (660, 450)) # 155x388
 
 ###################################################################################################
 
 # Currently returns dieA, dieB, dieC, dieD
 # NOTE: Each may return "None" if no die is found
 def compute_cropped_die_images(image):
-	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_size"])
-	dieB = crop_hsv_range_die_in_compartment(image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_size"])
-	dieC = crop_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_size"])
-	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_size"])
+	dieA = crop_hsv_range_die_in_compartment(image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_width"], die_types.params[DIE_TYPES[0]]["rect_height"])
+	dieB = crop_hsv_range_die_in_compartment(image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_width"], die_types.params[DIE_TYPES[1]]["rect_height"])
+	dieC = crop_hsv_range_die_in_compartment(image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_width"], die_types.params[DIE_TYPES[2]]["rect_height"])
+	dieD = crop_hsv_range_die_in_compartment(image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_width"], die_types.params[DIE_TYPES[3]]["rect_height"])
 	return (dieA, dieB, dieC, dieD)
 
 def capture_imagefile_name(index):
@@ -81,14 +81,13 @@ def compute_mask_center(mask):
 	return (int(maskMoments['m10'] / maskMoments['m00']), int(maskMoments['m01'] / maskMoments['m00']))
 	
 # Returns (pt1, pt2) boundary points array
-def centered_rect(center, size):
-	halfSize = int(size / 2)
-	pt1 = (center[0] - halfSize, center[1] - halfSize)
-	pt2 = (pt1[0]    +     size,    pt1[1] +     size)
+def centered_rect(center, width, height):
+	pt1 = (max(0, center[0] - int(width / 2)), max(0, center[1] - int(height / 2)))
+	pt2 = (pt1[0] + width, pt1[1] + height)
 	return (pt1, pt2)
 
 # Returns die rectangle
-def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_size):
+def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_width, rect_height):
 	compartment_image = image[compartment_rect[0][1]:compartment_rect[1][1], compartment_rect[0][0]:compartment_rect[1][0], :]
 	mask = compute_hsv_range_mask(compartment_image, hsv_ranges)
 		
@@ -98,7 +97,7 @@ def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_
 		return ((0, 0), (0, 0))
 	
 	die_center = compute_mask_center(mask)
-	die_rect = centered_rect(die_center, rect_size)
+	die_rect = centered_rect(die_center, rect_width, rect_height)
 	
 	# Sanity check that it covers all the data in the mask
 	# NOTE: Negative numbers have special meaning in slices, so clamp them out here
@@ -115,17 +114,17 @@ def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_
 	return die_rect_absolute
 
 # Returns "None" if die rect is invalid (die not found)
-def crop_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_size):
-	die_rect = find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_size)
+def crop_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_width, rect_height):
+	die_rect = find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_width, rect_height)
 		
 	cropped_image = image[die_rect[0][1]:die_rect[1][1], die_rect[0][0]:die_rect[1][0]]
-	if (cropped_image.shape[0] != rect_size or cropped_image.shape[1] != rect_size):
+	if (cropped_image.shape[1] != rect_width or cropped_image.shape[0] != rect_height):
 		return None
 	
 	return cropped_image
 	
-def draw_hsv_range_die_rect(output_image, source_image, compartment_rect, hsv_ranges, rect_size):
-	die_rect = find_hsv_range_die_in_compartment(source_image, compartment_rect, hsv_ranges, rect_size)
+def draw_hsv_range_die_rect(output_image, source_image, compartment_rect, hsv_ranges, rect_width, rect_height):
+	die_rect = find_hsv_range_die_in_compartment(source_image, compartment_rect, hsv_ranges, rect_width, rect_height)
 	return cv2.rectangle(output_image, die_rect[0], die_rect[1], (255, 0, 255), 1)
 	
 ###################################################################################################
@@ -168,27 +167,22 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		#test_hsv_range = ((  0,   0, 200), (255,  30+test_range, 255))
-		#test_hsv_range = ((150,  80,  60), (180, 255, 255))
-		test_hsv_range = ((0,  140, 60+test_range), (10, 255, 255))
-		test_hsv_range_2 = ((150,  80, 60), (180, 255, 255))
-		display = compute_hsv_range_mask(capture_image, [test_hsv_range, test_hsv_range_2], False)
+		#test_hsv_range = ((30, 0, test_range), (50, 255, 255))  # aow dice ish
+		test_hsv_range = ((40+test_range, 1, 0), (170, 60, 100))
+		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_A_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_B_RECT[0], COMPARTMENT_C_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_C_RECT[0], COMPARTMENT_B_RECT[1], (0, 255, 0), 1)
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_D_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_size"])
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_size"])
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_size"])
-		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_size"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_width"], die_types.params[DIE_TYPES[0]]["rect_height"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_width"], die_types.params[DIE_TYPES[1]]["rect_height"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_width"], die_types.params[DIE_TYPES[2]]["rect_height"])
+		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_width"], die_types.params[DIE_TYPES[3]]["rect_height"])
 		
 		dieA, dieB, dieC, dieD = compute_cropped_die_images(capture_image)
-		
-		if dieB is None:
-			print("Missing B!")
-		
+				
 		display = concat_images([rect_display, dieA, dieB, dieC, dieD])
 	
 	cv2.imshow('main1', display)
