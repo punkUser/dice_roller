@@ -54,13 +54,13 @@ def main():
 	
 	# Final test and display of mispredicted ones
 	test_accuracy = model.test(test_loader, True)
-	print("Test Set Accuracy: {}".format(test_accuracy))
+	print("Test set accuracy: {}".format(test_accuracy))
 	
 	# Now test all the training ones too, but without the augmentation
 	raw_train_set = dice_cnn.ImageFolderWithPaths(root=os.path.join("training_data", DIE_TYPE), transform=test_transform)
 	raw_train_loader = torch.utils.data.DataLoader(raw_train_set, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 	raw_train_acc = model.test(raw_train_loader, True)
-	print("Raw trainT Set Accuracy: {}".format(raw_train_acc))
+	print("Raw training set accuracy: {}".format(raw_train_acc))
 
 if __name__ == "__main__":
 	main()

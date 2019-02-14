@@ -124,8 +124,8 @@ params = {
 			"image_transform": AgeOfWarImgTransform(),
 			"lr": 0.005,
 			"momentum": 0.9,
-			"lr_reduction_steps": 100,
-			"total_steps": 200,
+			"lr_reduction_steps": 60,
+			"total_steps": 120,
 		},
 	}
 }

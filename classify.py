@@ -11,8 +11,8 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/xg10_xg11_xg12_xg13/20190202_091946/D/'
-DIE_TYPE = "xwing_green"
+ROOT_DATA_DIR  = 'output/captured_data/aow1_aow2_aow3_aow4/20190205_095311/D/'
+DIE_TYPE = "age_of_war"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'
 
@@ -65,7 +65,8 @@ def main():
 	#dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0][0:16], nrow = 4))
 		
 	# TODO: Sort out this workaround for class label timing... dependency is only on the # of classes really
-	model = dice_cnn.Model([str(x) for x in range(die_types.params[DIE_TYPE]["classes_count"])], die_types.params[DIE_TYPE]["rect_size"])
+	model = dice_cnn.Model([str(x) for x in range(die_types.params[DIE_TYPE]["classes_count"])],
+						   die_types.params[DIE_TYPE]["rect_width"], die_types.params[DIE_TYPE]["rect_height"])
 	model.load(os.path.join("models", DIE_TYPE + ".tar"))
 	class_labels = model.get_class_labels()
 	
