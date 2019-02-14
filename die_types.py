@@ -76,7 +76,13 @@ params = {
 		"rect_height": 84,
 		"classes_count": 4,			# blank, focus, hit, crit
 		"expected_distribution": {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0},
-		"train_image_transform": XwingImgTransform(),
+		"training": {
+			"image_transform": XwingImgTransform(),
+			"lr": 0.01,
+			"momentum": 0.9,
+			"lr_reduction_steps": 30,
+			"total_steps": 60,
+		},
 	},
 	"xwing_green": {
 		"hsv_ranges": [XWING_GREEN_DIE_HSV_RANGE],
@@ -84,15 +90,27 @@ params = {
 		"rect_height": 84,
 		"classes_count": 3,			# blank, focus, evade
 		"expected_distribution": {"blank": 3.0/8.0, "focus": 2.0/8.0, "evade": 3.0/8.0},
-		"train_image_transform": XwingImgTransform(),
+		"training": {
+			"image_transform": XwingImgTransform(),
+			"lr": 0.01,
+			"momentum": 0.9,
+			"lr_reduction_steps": 30,
+			"total_steps": 60,
+		},
 	},
 	"casino_blue": {
 		"hsv_ranges": [BLUE_CASINO_DIE_HSV_RANGE],
 		"rect_width": 100,
 		"rect_height": 100,
 		"classes_count": 6,			# 1-6
-		"train_image_transform": CasinoImgTransform(),
 		"expected_distribution": {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0},
+		"training": {
+			"image_transform": CasinoImgTransform(),
+			"lr": 0.01,
+			"momentum": 0.9,
+			"lr_reduction_steps": 30,
+			"total_steps": 60,
+		},
 	},
 	"age_of_war": {
 		# We don't try and crop the age of war dice since their colors are hard to separate from the background.
@@ -101,7 +119,13 @@ params = {
 		"rect_width": 155,
 		"rect_height": 388,
 		"classes_count": 6,
-		"train_image_transform": AgeOfWarImgTransform(), # for now
 		"expected_distribution": {"1sword": 1.0/6.0, "2sword": 1.0/6.0, "3sword": 1.0/6.0, "bow": 1.0/6.0, "horse": 1.0/6.0, "mask": 1.0/6.0},
+		"training": {
+			"image_transform": AgeOfWarImgTransform(),
+			"lr": 0.005,
+			"momentum": 0.9,
+			"lr_reduction_steps": 100,
+			"total_steps": 200,
+		},
 	}
 }

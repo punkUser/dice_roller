@@ -17,7 +17,7 @@ BATCH_SIZE = 16
 def main():
 	# Training data, including any die-specific training transform
 	train_transform = torchvision.transforms.Compose([
-		die_types.params[DIE_TYPE]["train_image_transform"],
+		die_types.params[DIE_TYPE]["training"]["image_transform"],
 		torchvision.transforms.ToTensor(),
 		torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 	])	
@@ -44,10 +44,12 @@ def main():
 	# Use the dimensions of the first image as representative
 	model_output_file = os.path.join("output", DIE_TYPE + ".tar")
 	model = dice_cnn.Model(class_label_strings, images[0].shape[2], images[0].shape[1],
-						   lr = 0.005, momentum = 0.9, lr_reduction_steps = 100)
+						   lr = die_types.params[DIE_TYPE]["training"]["lr"],
+						   momentum = die_types.params[DIE_TYPE]["training"]["momentum"],
+						   lr_reduction_steps = die_types.params[DIE_TYPE]["training"]["lr_reduction_steps"],)
 	
 	#model.load(model_output_file) # Continue onwards!
-	model.train(200, train_loader, test_loader)
+	model.train(die_types.params[DIE_TYPE]["training"]["total_steps"], train_loader, test_loader)
 	model.save(model_output_file)
 	
 	# Final test and display of mispredicted ones
