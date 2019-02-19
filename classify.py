@@ -11,7 +11,7 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/aow1_aow2_aow3_aow4/20190205_095311/D/'
+ROOT_DATA_DIR  = 'output/captured_data/aow1_aow2_aow3_aow4/20190205_095311/B/'
 DIE_TYPE = "age_of_war"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'

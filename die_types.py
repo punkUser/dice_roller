@@ -50,18 +50,18 @@ class CasinoImgTransform:
 class AgeOfWarImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
+			#imgaug.augmenters.Fliplr(0.5),
+			#imgaug.augmenters.Flipud(0.5),
+			imgaug.augmenters.Sometimes(0.05, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.6])),
+			imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
 			# We can't do a ton of geometry manipulation given we're using the whole compartment image currently
 			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Affine(
-				scale = (0.9, 1.0),
-				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+				scale = 1,
+				translate_percent = {"x": (-0.03, 0.03), "y": (-0.03, 0.03)},
 				rotate = (-5, 5),
 				order = 1,
 				cval = (0, 255),
 			)),
-			#imgaug.augmenters.Fliplr(0.5),
-			#imgaug.augmenters.Flipud(0.5),
-			#imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
 		])
 
 	def __call__(self, img):
@@ -124,8 +124,8 @@ params = {
 			"image_transform": AgeOfWarImgTransform(),
 			"lr": 0.005,
 			"momentum": 0.9,
-			"lr_reduction_steps": 60,
-			"total_steps": 120,
+			"lr_reduction_steps": 50,
+			"total_steps": 100,
 		},
 	}
 }
