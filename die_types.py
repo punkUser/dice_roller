@@ -52,15 +52,16 @@ class AgeOfWarImgTransform:
 		self.aug = imgaug.augmenters.Sequential([
 			#imgaug.augmenters.Fliplr(0.5),
 			#imgaug.augmenters.Flipud(0.5),
-			imgaug.augmenters.Sometimes(0.05, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.6])),
-			imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
+			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.Affine(rotate = 180)),
+			#imgaug.augmenters.Sometimes(0.05, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.6])),
+			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
 			# We can't do a ton of geometry manipulation given we're using the whole compartment image currently
 			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Affine(
 				scale = 1,
-				translate_percent = {"x": (-0.03, 0.03), "y": (-0.03, 0.03)},
-				rotate = (-5, 5),
+				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+				rotate = (-10, 10),
 				order = 1,
-				cval = (0, 255),
+				cval = (0, 255)
 			)),
 		])
 
@@ -122,10 +123,10 @@ params = {
 		"expected_distribution": {"1sword": 1.0/6.0, "2sword": 1.0/6.0, "3sword": 1.0/6.0, "bow": 1.0/6.0, "horse": 1.0/6.0, "mask": 1.0/6.0},
 		"training": {
 			"image_transform": AgeOfWarImgTransform(),
-			"lr": 0.005,
+			"lr": 0.008,
 			"momentum": 0.9,
-			"lr_reduction_steps": 50,
-			"total_steps": 100,
+			"lr_reduction_steps": 100,
+			"total_steps": 200,
 		},
 	}
 }

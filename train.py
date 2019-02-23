@@ -48,7 +48,7 @@ def main():
 						   momentum = die_types.params[DIE_TYPE]["training"]["momentum"],
 						   lr_reduction_steps = die_types.params[DIE_TYPE]["training"]["lr_reduction_steps"],)
 	
-	#model.load(model_output_file) # Continue onwards!
+	model.load(model_output_file) # Continue onwards!
 	model.train(die_types.params[DIE_TYPE]["training"]["total_steps"], train_loader, test_loader)
 	model.save(model_output_file)
 	
