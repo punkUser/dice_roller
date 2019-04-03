@@ -39,7 +39,7 @@ def main():
 	
 	# DEBUG: Show some training images
 	images, labels, paths = iter(train_loader).next()
-	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:16], nrow = 4))
+	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:6], nrow = 6))
 	
 	# Use the dimensions of the first image as representative
 	model_output_file = os.path.join("output", DIE_TYPE + ".tar")
@@ -48,7 +48,7 @@ def main():
 						   momentum = die_types.params[DIE_TYPE]["training"]["momentum"],
 						   lr_reduction_steps = die_types.params[DIE_TYPE]["training"]["lr_reduction_steps"],)
 	
-	model.load(model_output_file) # Continue onwards!
+	#model.load(model_output_file) # Continue onwards!
 	model.train(die_types.params[DIE_TYPE]["training"]["total_steps"], train_loader, test_loader)
 	model.save(model_output_file)
 	

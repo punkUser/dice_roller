@@ -11,8 +11,8 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/aow1_aow2_aow3_aow4/20190205_095311/D/'
-DIE_TYPE = "age_of_war"
+ROOT_DATA_DIR  = 'output/captured_data/xr14_xr15_xr16_xr17/20190329_160616/D/'
+DIE_TYPE = "xwing_red"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'
 

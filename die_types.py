@@ -52,13 +52,14 @@ class AgeOfWarImgTransform:
 		self.aug = imgaug.augmenters.Sequential([
 			#imgaug.augmenters.Fliplr(0.5),
 			#imgaug.augmenters.Flipud(0.5),
-			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.Affine(rotate = 180)),
+			#imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.Affine(rotate = 180)),
 			#imgaug.augmenters.Sometimes(0.05, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.6])),
-			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
+			imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
+			imgaug.augmenters.Multiply((0.8, 1.2)),
 			# We can't do a ton of geometry manipulation given we're using the whole compartment image currently
 			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Affine(
 				scale = 1,
-				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+				translate_percent = {"x": (-0.05, 0.05), "y": (-0.1, 0.1)},
 				rotate = (-10, 10),
 				order = 1,
 				cval = (0, 255)
@@ -126,7 +127,7 @@ params = {
 			"lr": 0.008,
 			"momentum": 0.9,
 			"lr_reduction_steps": 100,
-			"total_steps": 200,
+			"total_steps": 100,
 		},
 	}
 }

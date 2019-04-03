@@ -87,6 +87,10 @@ class Model:
 	
 		self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 		print("Device: {}".format(self.device))
+		#print(torch.cuda.current_device())
+		#print(torch.cuda.device(0))
+		#print(torch.cuda.device_count())
+		#print(torch.cuda.get_device_name(0))
 					
 		# Create model, optimizer and loss function
 		self.model = Net(len(self.class_labels), image_width, image_height)
