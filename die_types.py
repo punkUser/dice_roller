@@ -131,7 +131,7 @@ params = {
 			"lr": 0.01,
 			"momentum": 0.9,
 			"lr_reduction_steps": 30,
-			"total_steps": 60,
+			"total_steps": 120,
 		},
 	},
 	"age_of_war": {
