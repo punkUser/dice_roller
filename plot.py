@@ -5,8 +5,8 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/casino_blue/cb_run1_compartmentB.csv"
-DIE_TYPE = "casino_blue"
+INPUT_FILE = "results/d8_blue/d8b4_run1_compartmentD.csv"
+DIE_TYPE = "d8_blue"
 
 ###################################################################################################
 
@@ -35,7 +35,7 @@ def plot(title, roll_subplot, chisq_subplot, data, labels, print_totals = False)
 		
 	# Roll distribution
 	roll_plot = g_fig.add_subplot(roll_subplot)
-	colors = ['b', 'y', 'g', 'r', 'c', 'm', 'k']
+	colors = ['b', 'y', 'g', 'r', 'c', 'm', 'k', 'w']
 	for i, label in enumerate(labels):
 		roll_plot.plot(x, data_totals[:,i], colors[i] + '-', label="total " + label)
 		roll_plot.plot(x,    expected[:,i], colors[i] + ':', label="expected " + label)
