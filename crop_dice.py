@@ -8,12 +8,11 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr14_xr15_xr16_xr17/20190329_160616/'
+CAPTURE_DIR = 'captured_data/d8b1_d8b2_d8b3_d8b4/20190503_123325'
 INPUT_EXT = '.jpg'
-OUTPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["xwing_red", "xwing_red", "xwing_red", "xwing_red"]
+DIE_TYPES = ["d8_blue", "d8_blue", "d8_blue", "d8_blue"]
 
 
 ###################################################################################################
@@ -150,8 +149,6 @@ def concat_images(images):
 
 cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
-DieData = collections.namedtuple('DieData', ['index', 'compartment', 'known_value'])
-
 capture_index = 0
 last_capture_index = -1
 test_range = 0
@@ -167,8 +164,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		#test_hsv_range = ((30, 0, test_range), (50, 255, 255))  # aow dice ish
-		test_hsv_range = ((40+test_range, 1, 0), (170, 60, 100))
+		test_hsv_range = ((80, 130, 0), (130, 255, 255))
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()

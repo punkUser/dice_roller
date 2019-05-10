@@ -6,8 +6,14 @@ XWING_GREEN_DIE_HSV_RANGE = (( 60,  30,  60), ( 90, 255, 255))
 XWING_RED_DIE_HSV_RANGE_1 = ((  0, 140,  60), ( 10, 255, 255))
 XWING_RED_DIE_HSV_RANGE_2 = ((150,  80,  60), (180, 255, 255))
 
+# WIP, can't really get these working acceptably
+XWING_RED_BLACK_DIE_HSV_RANGE_1 = ((150, 20,  0), (180, 255, 255))
+XWING_RED_BLACK_DIE_HSV_RANGE_2 = (( 80,  0, 10), (180, 255,  50))
+
 BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
 WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
+
+D8_BLUE_DIE_HSV_RANGE = ((80, 130, 0), (130, 255, 255))
 
 class XwingImgTransform:
 	def __init__(self):
@@ -108,6 +114,20 @@ params = {
 		"expected_distribution": {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0},
 		"training": {
 			"image_transform": CasinoImgTransform(),
+			"lr": 0.01,
+			"momentum": 0.9,
+			"lr_reduction_steps": 30,
+			"total_steps": 60,
+		},
+	},
+	"d8_blue": {
+		"hsv_ranges": [D8_BLUE_DIE_HSV_RANGE],
+		"rect_width": 84,
+		"rect_height": 84,
+		"classes_count": 8,			# 1-8
+		"expected_distribution": {"one": 1.0/8.0, "two": 1.0/8.0, "three": 1.0/8.0, "four": 1.0/8.0, "five": 1.0/8.0, "six": 1.0/8.0, "seven": 1.0/8.0, "eight": 1.0/8.0},
+		"training": {
+			"image_transform": XwingImgTransform(),		# TODO
 			"lr": 0.01,
 			"momentum": 0.9,
 			"lr_reduction_steps": 30,
