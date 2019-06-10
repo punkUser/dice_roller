@@ -8,11 +8,11 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/d8b1_d8b2_d8b3_d8b4/20190503_123325'
+CAPTURE_DIR = 'captured_data/xr3dp1_xr2dp2_xr2dp3_xr2dp4/20190608_103916'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["d8_blue", "d8_blue", "d8_blue", "d8_blue"]
+DIE_TYPES = ["xwing_red", "xwing_red", "xwing_red", "xwing_red"]
 
 
 ###################################################################################################

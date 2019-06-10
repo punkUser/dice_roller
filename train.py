@@ -7,7 +7,7 @@ import dice_cnn
 import die_types
 
 # Settings
-DIE_TYPE = "d8_blue"
+DIE_TYPE = "xwing_red"
 
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
 BATCH_SIZE = 16
@@ -48,7 +48,7 @@ def main():
 						   momentum = die_types.params[DIE_TYPE]["training"]["momentum"],
 						   lr_reduction_steps = die_types.params[DIE_TYPE]["training"]["lr_reduction_steps"],)
 	
-	model.load(model_output_file) # Continue onwards!
+	#model.load(model_output_file) # Continue onwards!
 	model.train(die_types.params[DIE_TYPE]["training"]["total_steps"], train_loader, test_loader)
 	model.save(model_output_file)
 	
