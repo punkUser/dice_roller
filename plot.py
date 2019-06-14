@@ -5,7 +5,7 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/xwing_red/xr3dp4_run1_compartmentD.csv"
+INPUT_FILE = "results/xwing_red/xr3dp4_run2_compartmentD.csv"
 DIE_TYPE = "xwing_red"
 
 ###################################################################################################
@@ -28,7 +28,7 @@ def plot(title, roll_subplot, chisq_subplot, data, labels, print_totals = False)
 	
 	if print_totals:
 		print("{}".format(INPUT_FILE))
-		print("total rolls: {}".format(data_totals.shape[0]))
+		print("total rolls: {}".format(data.shape[0]))
 		print("chi squared: {}".format(chi_squared[-1]))
 		for i, label in enumerate(labels):
 			print("{}: Got {}, expected {} (delta {})".format(label, data_totals[-1,i], expected[-1,i], data_totals[-1,i] - expected[-1,i]))
@@ -63,9 +63,9 @@ if __name__ == "__main__":
 	data = raw_data[1:]
 	
 	g_fig = plt.figure(figsize=(15, 8))
-	plot("Roll Distribution", 211, 212, data[0:-1:1], labels, True)
-	#plot("Even Rolls",        232, 235, data[0:-1:2], labels)
-	#plot("Odd Rolls",         233, 236, data[1:-1:2], labels)
+	plot("Roll Distribution", 211, 212, data[0::1], labels, True)
+	#plot("Even Rolls",        232, 235, data[0::2], labels)
+	#plot("Odd Rolls",         233, 236, data[1::2], labels)
 	
 	# Show distribution of rolls that immediately follows a given roll
 	#rolls_following_plot_count = min(3, len(labels))

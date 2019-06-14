@@ -8,7 +8,7 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr3dp1_xr2dp2_xr2dp3_xr2dp4/20190608_103916'
+CAPTURE_DIR = 'captured_data/xr3dp1_xr3dp2_xr3dp3_xr3dp4/20190612_140512/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
@@ -22,10 +22,18 @@ KEY_DOWN  = 2621440
 KEY_RIGHT = 2555904
 KEY_LEFT  = 2424832
 
+# Most common rectangles
+#COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
+#COMPARTMENT_B_RECT = ((210, 62), (365, 450)) # 155x388
+#COMPARTMENT_C_RECT = ((360, 62), (515, 450)) # 155x388
+#COMPARTMENT_D_RECT = ((505, 62), (660, 450)) # 155x388
+
+# Latest rectangles
 COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
-COMPARTMENT_B_RECT = ((210, 62), (365, 450)) # 155x388
-COMPARTMENT_C_RECT = ((360, 62), (515, 450)) # 155x388
-COMPARTMENT_D_RECT = ((505, 62), (660, 450)) # 155x388
+COMPARTMENT_B_RECT = ((225, 62), (380, 450)) # 155x388
+COMPARTMENT_C_RECT = ((365, 62), (520, 450)) # 155x388
+COMPARTMENT_D_RECT = ((510, 62), (665, 450)) # 155x388
+
 
 ###################################################################################################
 
@@ -89,7 +97,9 @@ def centered_rect(center, width, height):
 def find_hsv_range_die_in_compartment(image, compartment_rect, hsv_ranges, rect_width, rect_height):
 	compartment_image = image[compartment_rect[0][1]:compartment_rect[1][1], compartment_rect[0][0]:compartment_rect[1][0], :]
 	mask = compute_hsv_range_mask(compartment_image, hsv_ranges)
-		
+	
+	#cv2.imshow("test", mask)
+	
 	# Sanity check if we found something
 	mask_pixels = np.count_nonzero(mask)
 	if mask_pixels < 50:
@@ -164,8 +174,8 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((80, 130, 0), (130, 255, 255))
-		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
+		#test_hsv_range = 
+		display = compute_hsv_range_mask(capture_image, [die_types.XWING_RED_DIE_HSV_RANGE_1, die_types.XWING_RED_DIE_HSV_RANGE_2], True)
 	else:
 		rect_display = capture_image.copy()
 		rect_display = cv2.rectangle(rect_display, COMPARTMENT_A_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
@@ -178,7 +188,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_D_RECT, die_types.params[DIE_TYPES[3]]["hsv_ranges"], die_types.params[DIE_TYPES[3]]["rect_width"], die_types.params[DIE_TYPES[3]]["rect_height"])
 		
 		dieA, dieB, dieC, dieD = compute_cropped_die_images(capture_image)
-				
+		
 		display = concat_images([rect_display, dieA, dieB, dieC, dieD])
 	
 	cv2.imshow('main1', display)
