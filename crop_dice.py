@@ -8,7 +8,7 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr3dp1_xr3dp2_xr3dp3_xr3dp4/20190612_140512/'
+CAPTURE_DIR = 'captured_data/xr3dp5_xr3dp6_xr3dp7_xr3dp8/20190614_100010/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
