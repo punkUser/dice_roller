@@ -11,7 +11,7 @@ INPUT_DIR = 'C:/Users/Andrew/Desktop/tosort'
 OUTPUT_DIR = 'C:/Users/Andrew/Desktop/sorted'
 INPUT_EXT = '.jpg'
 
-DIE_TYPE = "d8_blue"
+DIE_TYPE = "d8_orange"
 
 ###################################################################################################
 

@@ -13,7 +13,8 @@ XWING_RED_BLACK_DIE_HSV_RANGE_2 = (( 80,  0, 10), (180, 255,  50))
 BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
 WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
 
-D8_BLUE_DIE_HSV_RANGE = ((80, 130, 0), (130, 255, 255))
+D8_BLUE_DIE_HSV_RANGE   = ((80, 130,   0), (130, 255, 255))
+D8_ORANGE_DIE_HSV_RANGE = (( 0, 125, 100), ( 25, 255, 255))
 
 class XwingImgTransform:
 	def __init__(self):
@@ -134,20 +135,18 @@ params = {
 			"total_steps": 120,
 		},
 	},
-	"age_of_war": {
-		# We don't try and crop the age of war dice since their colors are hard to separate from the background.
-		# Instead we'll let the machine learning handle finding the die and identifying it in the image. Less efficient, but simpler for now.
-		"hsv_ranges": [((0, 0, 0), (255, 255, 255))],
-		"rect_width": 155,
-		"rect_height": 388,
-		"classes_count": 6,
-		"expected_distribution": {"1sword": 1.0/6.0, "2sword": 1.0/6.0, "3sword": 1.0/6.0, "bow": 1.0/6.0, "horse": 1.0/6.0, "mask": 1.0/6.0},
+	"d8_orange": {
+		"hsv_ranges": [D8_ORANGE_DIE_HSV_RANGE],
+		"rect_width": 84,
+		"rect_height": 84,
+		"classes_count": 8,			# 1-8
+		"expected_distribution": {"one": 1.0/8.0, "two": 1.0/8.0, "three": 1.0/8.0, "four": 1.0/8.0, "five": 1.0/8.0, "six": 1.0/8.0, "seven": 1.0/8.0, "eight": 1.0/8.0},
 		"training": {
-			"image_transform": AgeOfWarImgTransform(),
-			"lr": 0.008,
+			"image_transform": XwingImgTransform(),		# TODO
+			"lr": 0.01,
 			"momentum": 0.9,
-			"lr_reduction_steps": 100,
-			"total_steps": 100,
+			"lr_reduction_steps": 30,
+			"total_steps": 120,
 		},
-	}
+	},
 }
