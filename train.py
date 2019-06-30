@@ -39,7 +39,7 @@ def main():
 	
 	# DEBUG: Show some training images
 	images, labels, paths = iter(train_loader).next()
-	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:6], nrow = 6))
+	dice_cnn.show_tensor_image(torchvision.utils.make_grid(images[0:16], nrow = 4))
 	
 	# Use the dimensions of the first image as representative
 	model_output_file = os.path.join("output", DIE_TYPE + ".tar")

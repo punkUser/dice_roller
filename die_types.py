@@ -54,28 +54,27 @@ class CasinoImgTransform:
 		img = np.array(img)
 		return self.aug.augment_image(img)
 
-class AgeOfWarImgTransform:
+class D8OrangeImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
-			#imgaug.augmenters.Fliplr(0.5),
-			#imgaug.augmenters.Flipud(0.5),
-			#imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.Affine(rotate = 180)),
-			#imgaug.augmenters.Sometimes(0.05, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.6])),
-			imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
-			imgaug.augmenters.Multiply((0.8, 1.2)),
-			# We can't do a ton of geometry manipulation given we're using the whole compartment image currently
-			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Affine(
-				scale = 1,
-				translate_percent = {"x": (-0.05, 0.05), "y": (-0.1, 0.1)},
-				rotate = (-10, 10),
+			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
+			imgaug.augmenters.Affine(
+				scale = (0.8, 1.05),
+				translate_percent = {"x": (-0.15, 0.15), "y": (-0.15, 0.15)},
+				rotate = (0, 360),
 				order = 1,
-				cval = (0, 255)
-			)),
+				cval = (0, 255),
+			),
+			#imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
+			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Grayscale([0.5, 1.0])),
+			#imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
+			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5),
 		])
 
 	def __call__(self, img):
 		img = np.array(img)
 		return self.aug.augment_image(img)
+
 		
 # NOTE: Could use namedtuples for each of the elements here, but good enough for now
 params = {
@@ -142,11 +141,11 @@ params = {
 		"classes_count": 8,			# 1-8
 		"expected_distribution": {"one": 1.0/8.0, "two": 1.0/8.0, "three": 1.0/8.0, "four": 1.0/8.0, "five": 1.0/8.0, "six": 1.0/8.0, "seven": 1.0/8.0, "eight": 1.0/8.0},
 		"training": {
-			"image_transform": XwingImgTransform(),		# TODO
+			"image_transform": D8OrangeImgTransform(),
 			"lr": 0.01,
 			"momentum": 0.9,
 			"lr_reduction_steps": 30,
-			"total_steps": 120,
+			"total_steps": 60,
 		},
 	},
 }
