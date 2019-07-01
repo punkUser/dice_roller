@@ -5,8 +5,8 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/xwing_red/xr3dp8_run1_compartmentD.csv"
-DIE_TYPE = "xwing_red"
+INPUT_FILE = "results/d8_orange/d8o4_run1_compartmentD.csv"
+DIE_TYPE = "d8_orange"
 
 ###################################################################################################
 
@@ -62,21 +62,32 @@ if __name__ == "__main__":
 	labels = raw_data[0][1:]
 	data = raw_data[1:]
 	
-	g_fig = plt.figure(figsize=(15, 8))
-	plot("Roll Distribution", 211, 212, data[0::1], labels, True)
-	#plot("Even Rolls",        232, 235, data[0::2], labels)
-	#plot("Odd Rolls",         233, 236, data[1::2], labels)
+	#data = data[0:5600]
+	#data = data[5600:10666]
+	#data = data[10666:]
 	
-	# Show distribution of rolls that immediately follows a given roll
-	#rolls_following_plot_count = min(3, len(labels))
-	#g_fig = plt.figure(figsize=(20, 10))
-	#subplot_base = 200 + 10 * rolls_following_plot_count
-	#for label_index, label in enumerate(labels[0:rolls_following_plot_count]):
-	#	roll_subplot = subplot_base + label_index + 1
-	#	chisq_subplot = roll_subplot + rolls_following_plot_count
-	#	rolls_following_label = [x for i, x in enumerate(data) if i > 1 and int(data[i-1][label_index+1]) > 0]
-	#	plot("Distribution after {}".format(label), roll_subplot, chisq_subplot, rolls_following_label, labels)
+	if True:
+		g_fig = plt.figure(figsize=(15, 8))
+		plot("Roll Distribution", 211, 212, data[0::1], labels, True)
+	elif False:
+		g_fig = plt.figure(figsize=(15, 8))
+		plot("Roll Distribution", 231, 234, data[0::1], labels, True)
+		plot("Even Rolls",        232, 235, data[0::2], labels)
+		plot("Odd Rolls",         233, 236, data[1::2], labels)
+	else:
+		# Show distribution of rolls that immediately follows a given roll
+		rolls_following_plot_count = min(3, len(labels))
+		label_offset = 5
 		
+		g_fig = plt.figure(figsize=(20, 10))
+		subplot_base = 200 + 10 * rolls_following_plot_count
+		for i in range(rolls_following_plot_count):
+			label_index = i + label_offset
+			roll_subplot = subplot_base + i + 1
+			chisq_subplot = roll_subplot + rolls_following_plot_count
+			rolls_following_label = [x for i, x in enumerate(data) if i > 1 and int(data[i-1][label_index+1]) > 0]
+			plot("Distribution after {}".format(labels[label_index]), roll_subplot, chisq_subplot, rolls_following_label, labels)
+	
 	plt.tight_layout()
 	g_fig.savefig(os.path.splitext(INPUT_FILE)[0] + '.png')
 	plt.show()

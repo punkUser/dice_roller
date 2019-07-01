@@ -54,7 +54,8 @@ def capture_image_exists(index):
 	return Path(capture_imagefile_name(index)).exists()
 
 def read_capture_image(index):
-	return cv2.imread(capture_imagefile_name(index))
+	capture_image = cv2.imread(capture_imagefile_name(index))
+	return capture_image
 
 def save_cropped_die_image(image, compartment, file_name):
 	path = os.path.join('output', CAPTURE_DIR, compartment, 'cropped')
@@ -159,10 +160,11 @@ def concat_images(images):
 
 cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
-capture_index = 0
+capture_index = 40000
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
+normalize = True
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
 	if capture_index != last_capture_index:
@@ -174,7 +176,10 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((0, 125+test_range,  100), (25, 255, 255))
+		#test_hsv_range = (( 0, 100+test_range, 109), ( 20, 255, 255))
+		#test_hsv_range = (( 0, 80, 160), ( 20, 255, 255))		
+		test_hsv_range = (( 0, 125, 100+test_range), ( 20, 255, 255))
+		
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()
@@ -208,6 +213,8 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			print(test_range)
 		elif key == ord('t'):
 			tuning_ranges = not tuning_ranges
+		elif key == ord('n'):
+			normalize = not normalize
 		elif key == ord(' '):
 			# Process entire directory batch-style
 			missing_count = [0, 0, 0, 0]		# ABCD
@@ -219,8 +226,8 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 				if (i % 1000 == 0):
 					print("Processing {}".format(file))
 				total_count += 1
-								
-				batch_image = cv2.imread(str(file))				
+				
+				batch_image = cv2.imread(str(file))
 				if last_image is not None:
 					last_image_delta = compare_images(last_image, batch_image)
 					if (last_image_delta < 5):

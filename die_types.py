@@ -13,8 +13,11 @@ XWING_RED_BLACK_DIE_HSV_RANGE_2 = (( 80,  0, 10), (180, 255,  50))
 BLUE_CASINO_DIE_HSV_RANGE = (( 90, 130,  35), (120, 255, 255))
 WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
 
-D8_BLUE_DIE_HSV_RANGE   = ((80, 130,   0), (130, 255, 255))
-D8_ORANGE_DIE_HSV_RANGE = (( 0, 125, 100), ( 25, 255, 255))
+D8_BLUE_DIE_HSV_RANGE     = ((80, 130,   0), (130, 255, 255))
+
+# Need two ranges since sometimes we get a fairly high specular reflection on these metal dice
+D8_ORANGE_DIE_HSV_RANGE_1 = (( 0,  125, 100), ( 20, 255, 255))
+D8_ORANGE_DIE_HSV_RANGE_2 = (( 0,   80, 160), ( 20, 255, 255))
 
 class XwingImgTransform:
 	def __init__(self):
@@ -135,7 +138,7 @@ params = {
 		},
 	},
 	"d8_orange": {
-		"hsv_ranges": [D8_ORANGE_DIE_HSV_RANGE],
+		"hsv_ranges": [D8_ORANGE_DIE_HSV_RANGE_1, D8_ORANGE_DIE_HSV_RANGE_2],
 		"rect_width": 84,
 		"rect_height": 84,
 		"classes_count": 8,			# 1-8
