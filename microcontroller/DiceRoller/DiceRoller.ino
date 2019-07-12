@@ -12,11 +12,14 @@ static const int k_commandRangeTestUp     = 6;
 static const int k_commandRangeTestDown   = 7;
 static const int k_commandRangeTestValue  = 8;
 
-static const int k_upDegrees      = 0;
-static const int k_downDegrees    = 180;
-static const int k_loadDegrees    = 90;
+static const int k_upServoUs      = 1130;
+static const int k_loadServoUs    = 1500;
+static const int k_downServoUs    = 2010;
+
 
 static const int k_cycleTimeMs    = 3500;
+
+static bool g_fullCycle           = false;   // If true, will cycle up then down each "cycle" rather than alternate
 
 Servo g_servo;
 
@@ -25,7 +28,8 @@ static unsigned long g_previousTimeMs = 0;
 static bool g_cycleUpNext = false;
 static unsigned long g_timeSinceCycleStartMs = k_cycleTimeMs;
 
-static int g_rangeTestMs = 1500;
+static int g_rangeTestUs = 1500;
+static const int k_rangeTestDelta = 10;
 
 
 //---------------------------------------------------------------------------------------------
@@ -34,10 +38,31 @@ void setup()
 {
     Serial.begin(9600);
     
-    g_servo.attach(9, 1000, 2000);
-    g_servo.write(k_loadDegrees);
+    g_servo.attach(9);
+    g_servo.writeMicroseconds(k_loadServoUs);
 
     g_previousTimeMs = millis();
+}
+
+bool cycleNext()
+{
+    // Ignore if cycle is currently still happening
+    if (g_timeSinceCycleStartMs >= k_cycleTimeMs)
+    {
+        if (g_cycleUpNext)
+            g_servo.writeMicroseconds(k_upServoUs);
+        else
+            g_servo.writeMicroseconds(k_downServoUs);
+        
+        g_timeSinceCycleStartMs = 0;
+        g_cycleUpNext = !g_cycleUpNext;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void loop()
@@ -52,7 +77,21 @@ void loop()
     {
         g_timeSinceCycleStartMs += elapsedTimeMs;
         if (g_timeSinceCycleStartMs >= k_cycleTimeMs)
-            Serial.write(k_commandCycleDone);
+        {
+            if (g_fullCycle)
+            {
+                // Only send cycle complete after a DOWN cycle
+                if (g_cycleUpNext)
+                    Serial.write(k_commandCycleDone);
+                else
+                    cycleNext();
+            }
+            else
+            {
+                // Send cycle complete after every alternation
+                Serial.write(k_commandCycleDone);
+            }
+        }
     }
     
     // Handle any serial input
@@ -65,47 +104,37 @@ void loop()
             if (command == k_commandUp)
             {
                 g_timeSinceCycleStartMs = k_cycleTimeMs;
-                g_servo.write(k_upDegrees);
+                g_servo.writeMicroseconds(k_upServoUs);
             }
             else if (command == k_commandDown)
             {
                 g_timeSinceCycleStartMs = k_cycleTimeMs;
-                g_servo.write(k_downDegrees);
+                g_servo.writeMicroseconds(k_downServoUs);
             }
             else if (command == k_commandLoad)
             {
                 g_timeSinceCycleStartMs = k_cycleTimeMs;
-                g_servo.write(k_loadDegrees);
+                g_servo.writeMicroseconds(k_loadServoUs);
             }
             else if (command == k_commandCycle)
             {
-                // Ignore if cycle is currently still happening
-                if (g_timeSinceCycleStartMs >= k_cycleTimeMs)
-                {
-                    if (g_cycleUpNext)
-                        g_servo.write(k_upDegrees);
-                    else
-                        g_servo.write(k_downDegrees);
-                    
-                    g_timeSinceCycleStartMs = 0;
-                    g_cycleUpNext = !g_cycleUpNext;
-                }
+                cycleNext();
             }
             else if (command == k_commandRangeTestUp)
             {
                 g_timeSinceCycleStartMs = k_cycleTimeMs;
-                g_rangeTestMs += 10;
-                g_servo.write(g_rangeTestMs);
+                g_rangeTestUs += k_rangeTestDelta;
+                g_servo.writeMicroseconds(g_rangeTestUs);
                 Serial.write(k_commandRangeTestValue);
-                Serial.write(g_rangeTestMs / 10);   // 8 bit, good up to 2550ms
+                Serial.write(g_rangeTestUs / 10);   // 8 bit, good up to 2550ms
             }
             else if (command == k_commandRangeTestDown)
             {
                 g_timeSinceCycleStartMs = k_cycleTimeMs;
-                g_rangeTestMs -= 10;
-                g_servo.write(g_rangeTestMs);
+                g_rangeTestUs -= k_rangeTestDelta;
+                g_servo.writeMicroseconds(g_rangeTestUs);
                 Serial.write(k_commandRangeTestValue);
-                Serial.write(g_rangeTestMs / 10);   // 8 bit, good up to 2550ms
+                Serial.write(g_rangeTestUs / 10);   // 8 bit, good up to 2550ms
             }
         }
     }

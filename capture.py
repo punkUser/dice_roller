@@ -1,10 +1,11 @@
 # Settings
-CAPTURE_DIR = 'captured_data/test4/'
+CAPTURE_DIR = 'captured_data/d8o1_d8o2_d8o3_d8o4/'
 CAPTURE_EXT = '.jpg'
+INITIAL_CAPTURE_INDEX = 40000
 
 CAPTURE_BOX_START = (40, 80)
 CAPTURE_BOX_END = (840, 600)
-ARDUINO_PORT = 'COM5'
+ARDUINO_PORT = 'COM3'
 
 
 
@@ -80,7 +81,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
-captureIndex = 0
+captureIndex = INITIAL_CAPTURE_INDEX
 manualIndex = 0
 uniqueCaptureDir = os.path.join(CAPTURE_DIR, datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
 
@@ -135,7 +136,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			while (not arduinoSerial.readAvailable()):
 				pass
 			value = arduinoSerial.read();	# NOTE: Divided by 10 so we can get up to 2550 in 1 byte
-			print("Range test value: {}ms".format(value * 10))
+			print("Range test value: {}us".format(value * 10))
 	
 cap.release()
 cv2.destroyAllWindows()
