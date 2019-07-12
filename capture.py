@@ -2,7 +2,7 @@
 CAPTURE_DIR = 'captured_data/test4/'
 CAPTURE_EXT = '.jpg'
 
-CAPTURE_BOX_START = (90, 90)
+CAPTURE_BOX_START = (40, 80)
 CAPTURE_BOX_END = (840, 600)
 ARDUINO_PORT = 'COM5'
 
@@ -69,7 +69,7 @@ def saveCroppedFrame(frame, path, file):
 
 arduinoSerial = ArduinoSerial();
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW + 0)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
 #cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -105,10 +105,13 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			saveCroppedFrame(frame, CAPTURE_DIR, manualFileName)
 		elif key == KEY_UP:
 			arduinoSerial.write(COMMAND_UP)
+			print("UP")
 		elif key == KEY_DOWN:
 			arduinoSerial.write(COMMAND_DOWN)
+			print("DOWN")
 		elif key == KEY_RIGHT or key == KEY_LEFT:
 			arduinoSerial.write(COMMAND_LOAD)
+			print("LOAD")
 		elif key == ord(' '):
 			arduinoSerial.write(COMMAND_CYCLE)
 		elif key == ord('+'):
