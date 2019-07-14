@@ -1,10 +1,10 @@
 # Settings
-CAPTURE_DIR = 'captured_data/d8o1_d8o2_d8o3_d8o4/'
+CAPTURE_DIR = 'captured_data/d8o4_d8o3_d8o2_d8o1/'
 CAPTURE_EXT = '.jpg'
-INITIAL_CAPTURE_INDEX = 40000
+INITIAL_CAPTURE_INDEX = 0
 
-CAPTURE_BOX_START = (40, 80)
-CAPTURE_BOX_END = (840, 600)
+CAPTURE_BOX_START = (40, 90)
+CAPTURE_BOX_END = (840, 610)
 ARDUINO_PORT = 'COM3'
 
 
@@ -70,7 +70,7 @@ def saveCroppedFrame(frame, path, file):
 
 arduinoSerial = ArduinoSerial();
 
-cap = cv2.VideoCapture(cv2.CAP_DSHOW + 1)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW + 0)
 #cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
