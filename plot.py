@@ -5,7 +5,7 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/d8_orange/d8o4_run1_compartmentD.csv"
+INPUT_FILE = "results/d8_orange/d8o4_run3_compartmentA.csv"
 DIE_TYPE = "d8_orange"
 
 ###################################################################################################
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 	else:
 		# Show distribution of rolls that immediately follows a given roll
 		rolls_following_plot_count = min(3, len(labels))
-		label_offset = 5
+		label_offset = 0
 		
 		g_fig = plt.figure(figsize=(20, 10))
 		subplot_base = 200 + 10 * rolls_following_plot_count

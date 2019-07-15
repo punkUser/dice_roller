@@ -8,7 +8,7 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/d8o1_d8o2_d8o3_d8o4/20190626_145140/'
+CAPTURE_DIR = 'captured_data/d8o4_d8o3_d8o2_d8o1/20190713_232206/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
@@ -29,13 +29,25 @@ KEY_LEFT  = 2424832
 #COMPARTMENT_D_RECT = ((505, 62), (660, 450)) # 155x388
 
 # Latest rectangles
-COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
-COMPARTMENT_B_RECT = ((225, 62), (380, 450)) # 155x388
-COMPARTMENT_C_RECT = ((365, 62), (520, 450)) # 155x388
-COMPARTMENT_D_RECT = ((510, 62), (665, 450)) # 155x388
+COMPARTMENT_A_RECT = (( 90, 62), (245, 450)) # 155x388
+COMPARTMENT_B_RECT = ((245, 62), (400, 450)) # 155x388
+COMPARTMENT_C_RECT = ((385, 62), (540, 450)) # 155x388
+COMPARTMENT_D_RECT = ((530, 62), (685, 450)) # 155x388
 
 
 ###################################################################################################
+
+def increase_brightness(img, value=30):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
 
 # Currently returns dieA, dieB, dieC, dieD
 # NOTE: Each may return "None" if no die is found
@@ -160,7 +172,7 @@ def concat_images(images):
 
 cv2.namedWindow('main1', cv2.WINDOW_AUTOSIZE)
 
-capture_index = 40000
+capture_index = 0
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False

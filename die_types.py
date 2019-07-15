@@ -16,8 +16,8 @@ WHITE_DOTS_HSV_RANGE      = ((  0,   0, 200), (255,  30, 255))
 D8_BLUE_DIE_HSV_RANGE     = ((80, 130,   0), (130, 255, 255))
 
 # Need two ranges since sometimes we get a fairly high specular reflection on these metal dice
-D8_ORANGE_DIE_HSV_RANGE_1 = (( 0,  125, 100), ( 20, 255, 255))
-D8_ORANGE_DIE_HSV_RANGE_2 = (( 0,   80, 160), ( 20, 255, 255))
+D8_ORANGE_DIE_HSV_RANGE_1 = (( 0,  125,  70), ( 20, 255, 255))
+D8_ORANGE_DIE_HSV_RANGE_2 = (( 0,   80, 130), ( 20, 255, 255))
 
 class XwingImgTransform:
 	def __init__(self):
@@ -60,7 +60,7 @@ class CasinoImgTransform:
 class D8OrangeImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
-			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
+			imgaug.augmenters.Sometimes(0.4, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
 			imgaug.augmenters.Affine(
 				scale = (0.8, 1.05),
 				translate_percent = {"x": (-0.15, 0.15), "y": (-0.15, 0.15)},
@@ -69,7 +69,8 @@ class D8OrangeImgTransform:
 				cval = (0, 255),
 			),
 			#imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Grayscale([0.5, 1.0])),
+			imgaug.augmenters.Sometimes(0.2, imgaug.augmenters.Multiply((0.7, 1.6))),
+			imgaug.augmenters.Sometimes(0.3, imgaug.augmenters.Grayscale([0.5, 1.0])),
 			#imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
 			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5),
 		])
