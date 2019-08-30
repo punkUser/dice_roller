@@ -8,11 +8,11 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/d8o4_d8o3_d8o2_d8o1/20190713_232206/'
+CAPTURE_DIR = 'captured_data/xr1_xr2_xr3_xr4/20190828_173351/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["d8_orange", "d8_orange", "d8_orange", "d8_orange"]
+DIE_TYPES = ["xwing_red", "xwing_red", "xwing_red", "xwing_red"]
 
 
 ###################################################################################################
@@ -22,32 +22,25 @@ KEY_DOWN  = 2621440
 KEY_RIGHT = 2555904
 KEY_LEFT  = 2424832
 
-# Most common rectangles
+# Older 1.0 rectangles
 #COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
 #COMPARTMENT_B_RECT = ((210, 62), (365, 450)) # 155x388
 #COMPARTMENT_C_RECT = ((360, 62), (515, 450)) # 155x388
 #COMPARTMENT_D_RECT = ((505, 62), (660, 450)) # 155x388
 
-# Latest rectangles
-COMPARTMENT_A_RECT = (( 90, 62), (245, 450)) # 155x388
-COMPARTMENT_B_RECT = ((245, 62), (400, 450)) # 155x388
-COMPARTMENT_C_RECT = ((385, 62), (540, 450)) # 155x388
-COMPARTMENT_D_RECT = ((530, 62), (685, 450)) # 155x388
+# Newer 1.0 rectangles
+#COMPARTMENT_A_RECT = (( 90, 62), (245, 450)) # 155x388
+#COMPARTMENT_B_RECT = ((245, 62), (400, 450)) # 155x388
+#COMPARTMENT_C_RECT = ((385, 62), (540, 450)) # 155x388
+#COMPARTMENT_D_RECT = ((530, 62), (685, 450)) # 155x388
 
+# 2.0 rectangles
+COMPARTMENT_A_RECT = (( 30, 30), (165, 370))
+COMPARTMENT_B_RECT = ((160, 30), (300, 370))
+COMPARTMENT_C_RECT = ((295, 30), (435, 370))
+COMPARTMENT_D_RECT = ((430, 30), (565, 370))
 
 ###################################################################################################
-
-def increase_brightness(img, value=30):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
-
-    lim = 255 - value
-    v[v > lim] = 255
-    v[v <= lim] += value
-
-    final_hsv = cv2.merge((h, s, v))
-    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
-    return img
 
 # Currently returns dieA, dieB, dieC, dieD
 # NOTE: Each may return "None" if no die is found
@@ -176,7 +169,6 @@ capture_index = 0
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
-normalize = True
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
 	if capture_index != last_capture_index:
@@ -188,17 +180,15 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		#test_hsv_range = (( 0, 100+test_range, 109), ( 20, 255, 255))
-		#test_hsv_range = (( 0, 80, 160), ( 20, 255, 255))		
-		test_hsv_range = (( 0, 125, 100+test_range), ( 20, 255, 255))
+		test_hsv_range = ((  0,   0, 120), (255,  30, 255))
 		
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
 		rect_display = capture_image.copy()
-		rect_display = cv2.rectangle(rect_display, COMPARTMENT_A_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
-		rect_display = cv2.rectangle(rect_display, COMPARTMENT_B_RECT[0], COMPARTMENT_C_RECT[1], (0, 255, 0), 1)
-		rect_display = cv2.rectangle(rect_display, COMPARTMENT_C_RECT[0], COMPARTMENT_B_RECT[1], (0, 255, 0), 1)
-		rect_display = cv2.rectangle(rect_display, COMPARTMENT_D_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
+		rect_display = cv2.rectangle(rect_display, COMPARTMENT_A_RECT[0], COMPARTMENT_A_RECT[1], (0, 255, 0), 1)
+		rect_display = cv2.rectangle(rect_display, COMPARTMENT_B_RECT[0], COMPARTMENT_B_RECT[1], (0, 255, 0), 1)
+		rect_display = cv2.rectangle(rect_display, COMPARTMENT_C_RECT[0], COMPARTMENT_C_RECT[1], (0, 255, 0), 1)
+		rect_display = cv2.rectangle(rect_display, COMPARTMENT_D_RECT[0], COMPARTMENT_D_RECT[1], (0, 255, 0), 1)
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_A_RECT, die_types.params[DIE_TYPES[0]]["hsv_ranges"], die_types.params[DIE_TYPES[0]]["rect_width"], die_types.params[DIE_TYPES[0]]["rect_height"])
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_B_RECT, die_types.params[DIE_TYPES[1]]["hsv_ranges"], die_types.params[DIE_TYPES[1]]["rect_width"], die_types.params[DIE_TYPES[1]]["rect_height"])
 		rect_display = draw_hsv_range_die_rect(rect_display, capture_image, COMPARTMENT_C_RECT, die_types.params[DIE_TYPES[2]]["hsv_ranges"], die_types.params[DIE_TYPES[2]]["rect_width"], die_types.params[DIE_TYPES[2]]["rect_height"])
@@ -225,8 +215,6 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 			print(test_range)
 		elif key == ord('t'):
 			tuning_ranges = not tuning_ranges
-		elif key == ord('n'):
-			normalize = not normalize
 		elif key == ord(' '):
 			# Process entire directory batch-style
 			missing_count = [0, 0, 0, 0]		# ABCD
