@@ -7,7 +7,7 @@ import dice_cnn
 import die_types
 
 # Settings
-DIE_TYPE = "casino_blue"
+DIE_TYPE = "xwing_red_gd"
 
 # NOTE: Affects batch norm as well, so generally should be at least 8 or 16 or so for training
 BATCH_SIZE = 16

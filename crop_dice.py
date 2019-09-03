@@ -8,11 +8,11 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/d8o1_d8o2_d8o3_d8o4/20190830_101212/'
+CAPTURE_DIR = 'captured_data/xrgd1_xrgd2_xrgd3_xrgd4/20190901_092005/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["d8_orange", "d8_orange", "d8_orange", "d8_orange"]
+DIE_TYPES = ["xwing_red_gd", "xwing_red_gd", "xwing_red_gd", "xwing_red_gd"]
 
 
 ###################################################################################################
@@ -180,7 +180,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((  0,   0, 120), (255,  30, 255))
+		test_hsv_range = ((  0, 60,  20), ( test_range, 255, 255))
 		
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
