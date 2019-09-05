@@ -21,27 +21,8 @@ D8_BLUE_DIE_HSV_RANGE     = ((80, 130,   0), (130, 255, 255))
 # Need two ranges since sometimes we get a fairly high specular reflection on these metal dice
 D8_ORANGE_DIE_HSV_RANGE_1 = (( 0,  125, 100), ( 20, 255, 255))
 D8_ORANGE_DIE_HSV_RANGE_2 = (( 0,   80, 160), ( 20, 255, 255))
-
-class XwingImgTransform:
-	def __init__(self):
-		self.aug = imgaug.augmenters.Sequential([
-			imgaug.augmenters.Affine(
-				scale = (0.8, 1.1),
-				translate_percent = {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
-				rotate = (0, 360),
-				order = 1,
-				cval = (0, 255),
-			),
-			imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.AddToHueAndSaturation((-20, 20)),
-			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5)
-		])
-
-	def __call__(self, img):
-		img = np.array(img)
-		return self.aug.augment_image(img)
 		
-class XwingGDImgTransform:
+class XwingImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
 			imgaug.augmenters.Sometimes(0.2, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
@@ -84,29 +65,7 @@ class CasinoImgTransform:
 		img = np.array(img)
 		return self.aug.augment_image(img)
 
-class D8OrangeImgTransform:
-	def __init__(self):
-		self.aug = imgaug.augmenters.Sequential([
-			imgaug.augmenters.Sometimes(0.4, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
-			imgaug.augmenters.Affine(
-				scale = (0.8, 1.05),
-				translate_percent = {"x": (-0.15, 0.15), "y": (-0.15, 0.15)},
-				rotate = (0, 360),
-				order = 1,
-				cval = (0, 255),
-			),
-			#imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.Sometimes(0.2, imgaug.augmenters.Multiply((0.7, 1.6))),
-			imgaug.augmenters.Sometimes(0.3, imgaug.augmenters.Grayscale([0.5, 1.0])),
-			#imgaug.augmenters.AddToHueAndSaturation((-10, 10)),
-			#imgaug.augmenters.AdditiveGaussianNoise(loc = 0, scale = (0.0, 0.05*255), per_channel = 0.5),
-		])
 
-	def __call__(self, img):
-		img = np.array(img)
-		return self.aug.augment_image(img)
-
-		
 # NOTE: Could use namedtuples for each of the elements here, but good enough for now
 params = {
 	"xwing_red": {
@@ -144,7 +103,7 @@ params = {
 		"classes_count": 4,			# blank, focus, hit, crit
 		"expected_distribution": {"blank": 2.0/8.0, "focus": 2.0/8.0, "hit":   3.0/8.0, "crit":  1.0/8.0},
 		"training": {
-			"image_transform": XwingGDImgTransform(),
+			"image_transform": XwingImgTransform(),
 			"lr": 0.01,
 			"momentum": 0.9,
 			"lr_reduction_steps": 30,
@@ -177,20 +136,6 @@ params = {
 			"momentum": 0.9,
 			"lr_reduction_steps": 30,
 			"total_steps": 120,
-		},
-	},
-	"d8_orange": {
-		"hsv_ranges": [D8_ORANGE_DIE_HSV_RANGE_1, D8_ORANGE_DIE_HSV_RANGE_2],
-		"rect_width": 84,
-		"rect_height": 84,
-		"classes_count": 8,			# 1-8
-		"expected_distribution": {"one": 1.0/8.0, "two": 1.0/8.0, "three": 1.0/8.0, "four": 1.0/8.0, "five": 1.0/8.0, "six": 1.0/8.0, "seven": 1.0/8.0, "eight": 1.0/8.0},
-		"training": {
-			"image_transform": D8OrangeImgTransform(),
-			"lr": 0.01,
-			"momentum": 0.9,
-			"lr_reduction_steps": 30,
-			"total_steps": 60,
 		},
 	},
 }
