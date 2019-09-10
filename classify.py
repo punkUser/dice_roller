@@ -11,7 +11,7 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/xr18_xr19_xg18_xg19/20190904_123635/D/'
+ROOT_DATA_DIR  = 'output/captured_data/xr20_xg20_d6bgd1_d6bgd2/20190906_160723/B/'
 DIE_TYPE = "xwing_green"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'

@@ -18,6 +18,8 @@ WHITE_DOTS_HSV_RANGE      = ((  0,   0, 120), (255,  30, 255))
 
 D8_BLUE_DIE_HSV_RANGE     = ((80, 130,   0), (130, 255, 255))
 
+D6_BLUE_GD_DOTS_HSV_RANGE = ((120, 0, 70), (255, 255, 255))
+
 # Need two ranges since sometimes we get a fairly high specular reflection on these metal dice
 D8_ORANGE_DIE_HSV_RANGE_1 = (( 0,  125, 100), ( 20, 255, 255))
 D8_ORANGE_DIE_HSV_RANGE_2 = (( 0,   80, 160), ( 20, 255, 255))
@@ -130,6 +132,20 @@ params = {
 		"rect_height": 84,
 		"classes_count": 8,			# 1-8
 		"expected_distribution": {"one": 1.0/8.0, "two": 1.0/8.0, "three": 1.0/8.0, "four": 1.0/8.0, "five": 1.0/8.0, "six": 1.0/8.0, "seven": 1.0/8.0, "eight": 1.0/8.0},
+		"training": {
+			"image_transform": XwingImgTransform(),		# TODO
+			"lr": 0.01,
+			"momentum": 0.9,
+			"lr_reduction_steps": 30,
+			"total_steps": 120,
+		},
+	},
+	"d6_blue_gd": {
+		"hsv_ranges": [D6_BLUE_GD_DOTS_HSV_RANGE],
+		"rect_width": 84,
+		"rect_height": 84,
+		"classes_count": 6,			# 1-6
+		"expected_distribution": {"one": 1.0/6.0, "two": 1.0/6.0, "three": 1.0/6.0, "four": 1.0/6.0, "five": 1.0/6.0, "six": 1.0/6.0},
 		"training": {
 			"image_transform": XwingImgTransform(),		# TODO
 			"lr": 0.01,
