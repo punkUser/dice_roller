@@ -31,16 +31,13 @@ static const long g_positions[POS_NUM] = {
     ( 50 * k_microstepRatio),
 };
 
-// Cycle settings
-static const int k_cycleTimeMs = 3500;
-
 //---------------------------------------------------------------------------------------------
 
 static unsigned long g_previousTimeMs = 0;
 static AccelStepper g_stepper(AccelStepper::DRIVER, k_stepPin, k_dirPin);
 
 static bool g_cycleUpNext = false;
-static unsigned long g_timeSinceCycleStartMs = k_cycleTimeMs;
+static bool g_cycleActive = false;
 
 static long g_positionBias = 0;
 
@@ -82,11 +79,10 @@ void loop()
     bool moving = g_stepper.run();
 
     // Cycle logic
-    if (g_timeSinceCycleStartMs < k_cycleTimeMs)
+    if (g_cycleActive && !moving)
     {
-        g_timeSinceCycleStartMs += elapsedTimeMs;
-        if (g_timeSinceCycleStartMs >= k_cycleTimeMs && !moving)
-            Serial.write(k_commandCycleDone);
+        Serial.write(k_commandCycleDone);
+        g_cycleActive = false;
     }
 
     // Handle any serial input
@@ -98,33 +94,33 @@ void loop()
         {
             if (command == k_commandUp)
             {
-                g_timeSinceCycleStartMs = k_cycleTimeMs;
+                g_cycleActive = false;
                 if (!moving)
                     moveToPosition(POS_UP);
             }
             else if (command == k_commandDown)
             {
-                g_timeSinceCycleStartMs = k_cycleTimeMs;
+                g_cycleActive = false;
                 if (!moving)
                     moveToPosition(POS_DOWN);
             }
             else if (command == k_commandLoad)
             {
-                g_timeSinceCycleStartMs = k_cycleTimeMs;
+                g_cycleActive = false;
                 if (!moving)
                     moveToPosition(POS_LOAD);
             }
             else if (command == k_commandCycle)
             {
                 // Ignore if cycle is currently still happening
-                if (g_timeSinceCycleStartMs >= k_cycleTimeMs && !moving)
+                if (!g_cycleActive && !moving)
                 {
                     if (g_cycleUpNext)
                         moveToPosition(POS_UP);
                     else
                         moveToPosition(POS_DOWN);
                     
-                    g_timeSinceCycleStartMs = 0;
+                    g_cycleActive = true;
                     g_cycleUpNext = !g_cycleUpNext;
                 }
             }
