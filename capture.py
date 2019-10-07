@@ -1,12 +1,15 @@
 # Settings
-CAPTURE_DIR = 'captured_data/cxd6p5_cxd6p6_cxd6p7_cxd6p8/'
+CAPTURE_DIR = 'captured_data/cxd6p9_cxd6p10_cxd6p11_cxd6p12/'
 CAPTURE_EXT = '.jpg'
 INITIAL_CAPTURE_INDEX = 0
 
 CAPTURE_BOX_START = (140, 150)
 CAPTURE_BOX_END = (730, 540)
 ARDUINO_PORT = 'COM3'
-CYCLE_WAIT_TIME_SECONDS = 4.0
+
+# Set to zero or negative to disable early cycle
+CYCLE_MOTION_THRESHOLD = 0.55
+MAX_CYCLE_WAIT_TIME_SECONDS = 10.0
 
 
 
@@ -55,6 +58,8 @@ class ArduinoSerial:
     def read(self):
         return int.from_bytes(self.m_serial.read(1), byteorder='little')
 
+def cropFrame(frame):
+    return frame[CAPTURE_BOX_START[1]:CAPTURE_BOX_END[1], CAPTURE_BOX_START[0]:CAPTURE_BOX_END[0]]
 
 def saveCroppedFrame(frame, path, file):
     # TODO: Create unique path with date/time in it to avoid ever stomping anything
@@ -64,9 +69,18 @@ def saveCroppedFrame(frame, path, file):
     fileName = os.path.join(path, file)
     print(fileName)
 
-    croppedFrame = frame[CAPTURE_BOX_START[1]:CAPTURE_BOX_END[1], CAPTURE_BOX_START[0]:CAPTURE_BOX_END[0]]  
-    cv2.imwrite(fileName, croppedFrame)
-    
+    cv2.imwrite(fileName, cropFrame(frame))
+
+def denoise_image(image):
+    image = cv2.GaussianBlur(image, (11, 11), 5)
+    return image
+
+def compare_cropped_images(image1, image2):
+    image1Denoise = denoise_image(cropFrame(image1));
+    image2Denoise = denoise_image(cropFrame(image2));
+    delta = cv2.absdiff(image1Denoise, image2Denoise)
+    return np.mean(delta)
+
 
 ###################################################################################################
 
@@ -89,6 +103,10 @@ uniqueCaptureDir = os.path.join(CAPTURE_DIR, datetime.datetime.now().strftime("%
 
 cycleDone = False
 cycleEndTime = time.time()
+
+lastImageCompareFrame = None
+lastImageCompareTime = time.time()
+lastFrameCompareDelta = 9999999999
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
     ret, frame = cap.read()
@@ -143,15 +161,24 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
             value = arduinoSerial.read();   # NOTE: Divided by 10 so we can get up to 2550 in 1 byte
             print("Range test value: {}us".format(value * 10))
     
-    # Check for next cycle
     currentTime = time.time()
-    if cycleDone and (currentTime - cycleEndTime) > CYCLE_WAIT_TIME_SECONDS:
-        saveCroppedFrame(frame, uniqueCaptureDir, "{:06d}{}".format(captureIndex, CAPTURE_EXT))
-        captureIndex += 1
-        
-        # Auto-continue with next cycle
-        arduinoSerial.write(COMMAND_CYCLE)
-        cycleDone = False
+    
+    if (currentTime - lastImageCompareTime) > 0.5:
+        if lastImageCompareFrame is not None:
+            lastFrameCompareDelta = compare_cropped_images(lastImageCompareFrame, frame)
+            #print(lastFrameCompareDelta)
+        lastImageCompareFrame = frame
+        lastImageCompareTime = currentTime
+    
+    # Check for next cycle
+    if cycleDone:
+        if ((currentTime - cycleEndTime) > MAX_CYCLE_WAIT_TIME_SECONDS) or (lastFrameCompareDelta < CYCLE_MOTION_THRESHOLD):
+            saveCroppedFrame(frame, uniqueCaptureDir, "{:06d}{}".format(captureIndex, CAPTURE_EXT))
+            captureIndex += 1
+            
+            # Auto-continue with next cycle
+            arduinoSerial.write(COMMAND_CYCLE)
+            cycleDone = False
     
 cap.release()
 cv2.destroyAllWindows()
