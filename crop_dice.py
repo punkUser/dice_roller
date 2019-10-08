@@ -8,19 +8,14 @@ from pathlib import Path
 import die_types
 
 # Settings
-CAPTURE_DIR = 'captured_data/xr20_xg20_d6bgd1_d6bgd2/20190906_160723/'
+CAPTURE_DIR = 'captured_data/cxd6p9_cxd6p10_cxd6p11_cxd6p12/20191006_185145/'
 INPUT_EXT = '.jpg'
 
 # Compartments ABCD; should match the types in die_types.py
-DIE_TYPES = ["xwing_red", "xwing_green", "d6_blue_gd", "d6_blue_gd"]
+DIE_TYPES = ["generic_d6", "generic_d6", "generic_d6", "generic_d6"]
 
 
 ###################################################################################################
-
-KEY_UP	  = 2490368
-KEY_DOWN  = 2621440
-KEY_RIGHT = 2555904
-KEY_LEFT  = 2424832
 
 # Older 1.0 rectangles
 #COMPARTMENT_A_RECT = (( 70, 62), (225, 450)) # 155x388
@@ -169,8 +164,9 @@ capture_index = 0
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
+print(cv2.getBuildInformation())
 
-while (cv2.getWindowProperty('main1', 0) >= 0):
+while (cv2.getWindowProperty('main1', cv2.WND_PROP_VISIBLE) > 0):
 	if capture_index != last_capture_index:
 		if capture_image_exists(capture_index):
 			capture_image = read_capture_image(capture_index)
@@ -180,7 +176,7 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((test_range, 0, 70), (255, 255, 255))
+		test_hsv_range = ((120, 60, 40), (255, 255, 255))
 		
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:
@@ -202,15 +198,16 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
 	
 	key = cv2.waitKeyEx(10)
 	if (key >= 0):
-		if key == KEY_RIGHT:
+		#print(key)
+		if key == ord('d'):
 			capture_index += 1
-		elif key == KEY_LEFT:
+		elif key == ord('a'):
 			if (capture_index > 0):
 				capture_index -= 1;
-		elif key == KEY_DOWN:
+		elif key == ord('w'):
 			test_range += 1
 			print(test_range)
-		elif key == KEY_UP:
+		elif key == ord('s'):
 			test_range -= 1
 			print(test_range)
 		elif key == ord('t'):

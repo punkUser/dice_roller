@@ -4,8 +4,6 @@ import torch.optim
 import torchvision.datasets
 import numpy as np
 import matplotlib.pyplot as plt
-from imgaug import augmenters as iaa
-import imgaug
 
 # Add paths to the return value of ImageFolders; useful for user output/messages
 class ImageFolderWithPaths(torchvision.datasets.ImageFolder):

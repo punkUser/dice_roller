@@ -4,9 +4,6 @@ Note: Instructions may be out of date... generally follow usual python practices
 
 # Miniconda (preferred as needed for pytorch)
 ```
-conda install -c anaconda opencv
-conda install -c anaconda pyserial
-conda install pytorch torchvision -c pytorch
-conda install shapely
-pip install imgaug (doesn't seem to be in conda)
+conda install -c conda-forge imgaug opencv pyserial shapely
+conda install -c pytorch pytorch torchvision
 ```
