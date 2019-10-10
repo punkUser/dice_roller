@@ -1,5 +1,5 @@
 # Settings
-CAPTURE_DIR = 'captured_data/cxd6p9_cxd6p10_cxd6p11_cxd6p12/'
+CAPTURE_DIR = 'captured_data/cxd6p5_cxd6p6_cxd6p7_cxd6p8/'
 CAPTURE_EXT = '.jpg'
 INITIAL_CAPTURE_INDEX = 0
 
@@ -7,8 +7,13 @@ CAPTURE_BOX_START = (140, 150)
 CAPTURE_BOX_END = (730, 540)
 ARDUINO_PORT = 'COM3'
 
-# Set to zero or negative to disable early cycle
-CYCLE_MOTION_THRESHOLD = 0.55
+# Each CYCLE_MOTION_PERIOD_SECONDS seconds, the (cropped) image region is compared to the
+# one from the last period. If it passes the PSNR threshold, a count is incremented (otherwise zeroed).
+# After CYCLE_MOTION_THRESHOLD_COUNT matching periods, or MAX_CYCLE_WAIT_TIME_SECONDS, the cycle continues.
+# To disable motion-based cycling set the PSNR threshold to >100
+CYCLE_MOTION_PERIOD_SECONDS = 0.4
+CYCLE_MOTION_THRESHOLD_PSNR = 48.0
+CYCLE_MOTION_THRESHOLD_COUNT = 2
 MAX_CYCLE_WAIT_TIME_SECONDS = 10.0
 
 
@@ -18,6 +23,7 @@ import numpy as np
 import cv2
 import serial
 import os
+import math
 from pathlib import Path
 import datetime
 import time
@@ -71,6 +77,13 @@ def saveCroppedFrame(frame, path, file):
 
     cv2.imwrite(fileName, cropFrame(frame))
 
+def psnr(img1, img2):
+    mse = np.mean( (img1 - img2) ** 2 )
+    if mse == 0:
+        return 100
+    PIXEL_MAX = 255.0
+    return 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+
 def denoise_image(image):
     image = cv2.GaussianBlur(image, (11, 11), 5)
     return image
@@ -78,7 +91,7 @@ def denoise_image(image):
 def compare_cropped_images(image1, image2):
     image1Denoise = denoise_image(cropFrame(image1));
     image2Denoise = denoise_image(cropFrame(image2));
-    delta = cv2.absdiff(image1Denoise, image2Denoise)
+    delta = psnr(image1Denoise, image2Denoise);
     return np.mean(delta)
 
 
@@ -106,7 +119,7 @@ cycleEndTime = time.time()
 
 lastImageCompareFrame = None
 lastImageCompareTime = time.time()
-lastFrameCompareDelta = 9999999999
+lastImageCompareMatchedCount = 0
 
 while (cv2.getWindowProperty('main1', 0) >= 0):
     ret, frame = cap.read()
@@ -163,16 +176,19 @@ while (cv2.getWindowProperty('main1', 0) >= 0):
     
     currentTime = time.time()
     
-    if (currentTime - lastImageCompareTime) > 0.5:
+    if (currentTime - lastImageCompareTime) > CYCLE_MOTION_PERIOD_SECONDS:
         if lastImageCompareFrame is not None:
-            lastFrameCompareDelta = compare_cropped_images(lastImageCompareFrame, frame)
-            #print(lastFrameCompareDelta)
+            lastFrameComparePsnr = compare_cropped_images(lastImageCompareFrame, frame)
+            if lastFrameComparePsnr > CYCLE_MOTION_THRESHOLD_PSNR:
+                lastImageCompareMatchedCount = lastImageCompareMatchedCount + 1
+            else:
+                lastImageCompareMatchedCount = 0
         lastImageCompareFrame = frame
         lastImageCompareTime = currentTime
     
     # Check for next cycle
     if cycleDone:
-        if ((currentTime - cycleEndTime) > MAX_CYCLE_WAIT_TIME_SECONDS) or (lastFrameCompareDelta < CYCLE_MOTION_THRESHOLD):
+        if ((currentTime - cycleEndTime) > MAX_CYCLE_WAIT_TIME_SECONDS) or (lastImageCompareMatchedCount >= CYCLE_MOTION_THRESHOLD_COUNT):
             saveCroppedFrame(frame, uniqueCaptureDir, "{:06d}{}".format(captureIndex, CAPTURE_EXT))
             captureIndex += 1
             
