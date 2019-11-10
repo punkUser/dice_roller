@@ -169,8 +169,6 @@ class Model:
 	# TODO: Pull loader loop outside of this class likely
 	def train(self, numEpochs, train_loader, test_loader):
 		for localEpoch in range(numEpochs):
-			# Update epoch-based optimizer learning rate
-			self.scheduler.step()
 			self.model.train()
 			
 			total = 0
@@ -199,6 +197,9 @@ class Model:
 
 			test_accuracy = self.test(test_loader)
 			print("Epoch {}, Train Accuracy: {:.5f} , train_loss: {} , Test Accuracy: {:.5f}".format(self.epoch, train_accuracy, train_loss, test_accuracy))
+			
+			# Update epoch-based optimizer learning rate
+			self.scheduler.step()
 			
 			#self.save("output/checkpoint.tar")
 			self.epoch += 1

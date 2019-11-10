@@ -164,7 +164,6 @@ capture_index = 0
 last_capture_index = -1
 test_range = 0
 tuning_ranges = False
-print(cv2.getBuildInformation())
 
 while (cv2.getWindowProperty('main1', cv2.WND_PROP_VISIBLE) > 0):
 	if capture_index != last_capture_index:
@@ -176,7 +175,7 @@ while (cv2.getWindowProperty('main1', cv2.WND_PROP_VISIBLE) > 0):
 		last_capture_index = capture_index
 
 	if tuning_ranges:
-		test_hsv_range = ((120, 60, 40), (255, 255, 255))
+		test_hsv_range = ((120, 60, 40+test_range), (255, 255, 255))
 		
 		display = compute_hsv_range_mask(capture_image, [test_hsv_range], False)
 	else:

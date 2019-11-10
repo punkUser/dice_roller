@@ -11,7 +11,7 @@ import dice_cnn
 import die_types
 
 # Settings
-ROOT_DATA_DIR  = 'output/captured_data/cxd6p1_cxd6p2_cxd6p3_cxd6p4/20190917_154330/A/'
+ROOT_DATA_DIR  = 'output/captured_data/cxd6p9_cxd6p10_cxd6p11_cxd6p12/20191006_185145/D/'
 DIE_TYPE = "generic_d6"
 COPY_CLASSIFIED_FILES = True
 INPUT_EXT = '.jpg'

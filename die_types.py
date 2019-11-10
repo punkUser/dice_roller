@@ -18,7 +18,7 @@ WHITE_DOTS_HSV_RANGE      = ((  0,   0, 120), (255,  30, 255))
 
 D8_BLUE_DIE_HSV_RANGE     = ((80, 130,   0), (130, 255, 255))
 
-CXD6_PINK_DIE_HSV_RANGE = ((120, 60, 40), (255, 255, 255))
+CXD6_PINK_DIE_HSV_RANGE = ((120, 60, 55), (255, 255, 255))
 
 
 
@@ -50,20 +50,18 @@ class XwingImgTransform:
 class GenericD6ImgTransform:
 	def __init__(self):
 		self.aug = imgaug.augmenters.Sequential([
-			imgaug.augmenters.Sometimes(0.2, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.25))),
+			imgaug.augmenters.Sometimes(0.2, imgaug.augmenters.CoarseDropout((0.01, 0.05), size_percent=(0.10, 0.3))),
+			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Multiply((0.8, 1.2))),
+			imgaug.augmenters.Sometimes(0.3, imgaug.augmenters.Add((-20, 20))),
+			imgaug.augmenters.Sometimes(0.1, imgaug.augmenters.AddToHue((-255, 255))),
 			imgaug.augmenters.Affine(
-				scale = (0.8, 1.1),
-				translate_percent = {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
+				scale = (0.9, 1.0),
+				translate_percent = {"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
 				rotate = (0, 360),
 				order = 1,
 				cval = (0, 255),
 			),
-			#imgaug.augmenters.Sometimes(0.25, imgaug.augmenters.GaussianBlur(sigma=[1.0, 1.8])),
-			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Add((0, 100))),
-			imgaug.augmenters.Sometimes(0.5, imgaug.augmenters.Multiply((0.9, 1.5))),
-			imgaug.augmenters.Sometimes(0.3, imgaug.augmenters.AddToHue((-255, 255))),
-			imgaug.augmenters.Sometimes(0.3, imgaug.augmenters.Grayscale([0.5, 1.0])),
-			
+			imgaug.augmenters.Sometimes(0.1, imgaug.augmenters.Grayscale([0.5, 1.0])),
 		])
 
 	def __call__(self, img):

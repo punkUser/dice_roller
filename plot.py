@@ -5,8 +5,8 @@ import die_types
 import os.path;
 
 # Settings
-INPUT_FILE = "results/xwing_green/xg20_run1.csv"
-DIE_TYPE = "xwing_green"
+INPUT_FILE = "results/chessex_d6_pink/cxd6p12_run1.csv"
+DIE_TYPE = "generic_d6"
 
 ###################################################################################################
 
